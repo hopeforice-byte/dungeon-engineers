@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Инженеры Подземелий — Персонаж</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles/main.css">
+    <style>
+        /* Дополнительные стили специфичные для чарника персонажа */
+        .char-stats-panel {
+            background: linear-gradient(135deg, #1a1a1a 0%, #151515 100%);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 16px;
+        }
+        .stat-highlight {
+            color: #f0a500;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        .animation-pulse {
+            animation: pulse 2s infinite;
+        }
+        .tooltip-info {
+            border-bottom: 1px dashed #f0a500;
+            cursor: help;
+        }
+        .level-progress {
+            background: #2a2a2a;
+            border-radius: 10px;
+            height: 6px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+        .level-progress-fill {
+            background: #f0a500;
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        .ability-new {
+            background: linear-gradient(90deg, #2a1f0f, #151515);
+            border-left: 3px solid #2ecc71;
+        }
+        .fade-out {
+            animation: fadeOut 0.5s ease forwards;
+        }
+        @keyframes fadeOut {
+            to { opacity: 0; display: none; }
+        }
+    </style>
+</head>
+<body>
+<div class="app-container" id="app">
+    <div class="loading">
+        ⚙️ Загрузка генератора персонажа...<br>
+        <small style="color:#888;">Загрузка файлов из папки ../data/</small>
+    </div>
+</div>
+
+<script>
+    // ======================== ЗАГРУЗКА ДАННЫХ ========================
+    const loadedData = {};
+    const errors = [];
+    
+    const LEVEL_SKILL_POINTS = {1:0,2:1,3:1,4:2,5:1,6:1,7:2,8:1,9:1,10:1};
+    const LEVEL_MAX_SKILL = {1:6,2:7,3:7,4:8,5:8,6:9,7:9,8:10,9:10,10:10};
+    const LEVELS_WITH_SPEC = [3,6,9];
+    
+    async function loadJSON(url, name) {
+        try {
+            console.log(`📥 Загрузка: ${url}`);
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const data = await response.json();
+            loadedData[name] = data;
+            console.log(`✅ Загружен: ${name}`);
+            return true;
+        } catch (e) {
+            errors.push(`${name}: ${e.message}`);
+            console.error(`❌ Ошибка: ${name}`, e);
+            return false;
+        }
+    }
+    
+    async function init() {
+        await Promise.all([
+            loadJSON('../data/races.json', 'races'),
+            loadJSON('../data/classes.json', 'classes'),
+            loadJSON('../data/weapons.json', 'weapons'),
+            loadJSON('../data/armor.json', 'armor'),
+            loadJSON('../data/backgrounds.json', 'backgrounds'),
+            loadJSON('../data/contacts.json', 'contacts'),
+            loadJSON('../data/equipment.json', 'equipment'),
+            loadJSON('../data/implants.json', 'implants')
+        ]);
+        
+        if (errors.length > 0) {
+            document.getElementById('app').innerHTML = `
+                <div class="error-message">
+                    <div style="font-size:1.2rem;">❌ Ошибка загрузки данных</div>
+                    <div style="margin-top:20px;">${errors.map(e => `• ${e}`).join('<br>')}</div>
+                    <div style="margin-top:20px; color:#888;">
+                        <strong>Решение:</strong><br>
+                        1. Запустите через <strong>Live Server</strong> в VS Code<br>
+                        2. Убедитесь, что папка называется <strong>data</strong><br>
+                        3. Все файлы должны быть в папке <strong>../data/</strong>
+                    </div>
+                    <button onclick="location.reload()" style="margin-top:20px; background:#f0a500; border:none; padding:8px 20px; border-radius:20px; cursor:pointer;">🔄 Повторить</button>
+                    <button onclick="location.href='../index.html'" style="margin-top:20px; margin-left:10px; background:#2a2a2a; border:1px solid #f0a500; color:#f0a500; padding:8px 20px; border-radius:20px; cursor:pointer;">🏠 Главное меню</button>
+                </div>
+            `;
+            return;
+        }
+        
+        window.RACES_DATA = loadedData.races.races || loadedData.races;
+        window.CLASSES_DATA = loadedData.classes.classes || loadedData.classes;
+        window.WEAPONS_DATA = loadedData.weapons.weapons || loadedData.weapons;
+        window.ARMOR_DATA = loadedData.armor.armor || loadedData.armor;
+        window.BACKGROUNDS_DATA = loadedData.backgrounds.backgrounds || loadedData.backgrounds;
+        window.CONTACTS_DATA = loadedData.contacts.contacts || loadedData.contacts;
+        
+        // Имплантаты
+        const implantsJson = loadedData.implants;
+        if (implantsJson && implantsJson.implants && implantsJson.implants.items) {
+            window.IMPLANTS_DATA = implantsJson.implants.items;
+            window.IMPLANTS_SLOTS = implantsJson.implants.slots;
+            window.ALIENATION_STAGES = implantsJson.implants.alienation_stages;
+        } else if (implantsJson && implantsJson.items) {
+            window.IMPLANTS_DATA = implantsJson.items;
+            window.IMPLANTS_SLOTS = implantsJson.slots;
+            window.ALIENATION_STAGES = implantsJson.alienation_stages;
+        } else if (implantsJson && Array.isArray(implantsJson)) {
+            window.IMPLANTS_DATA = implantsJson;
+        } else {
+            window.IMPLANTS_DATA = [];
+            window.ALIENATION_STAGES = [
+                {"max": 15, "stage": "Человек", "effect": "Нет эффекта"},
+                {"max": 30, "stage": "Модификант", "effect": "Помеха на INF с «чистыми» людьми"},
+                {"max": 50, "stage": "Киборг", "effect": "Обычная еда не насыщает"},
+                {"max": 70, "stage": "Машина", "effect": "Помеха на PER (эмпатия)"},
+                {"max": 90, "stage": "Грань", "effect": "Нет снов. Дети боятся"},
+                {"max": 100, "stage": "Голем (NPC)", "effect": "Персонаж становится NPC"}
+            ];
+        }
+        
+        const eq = loadedData.equipment;
+        window.CONSUMABLES_DATA = [
+            ...(eq.consumables?.medical || []),
+            ...(eq.consumables?.technical || []),
+            ...(eq.consumables?.survival || []),
+            ...(eq.consumables?.drugs || []),
+            ...(eq.tools || []),
+            ...(eq.grenades || [])
+        ];
+        
+        console.log('✅ Все данные загружены!');
+        console.log(`🦾 Имплантатов: ${IMPLANTS_DATA ? IMPLANTS_DATA.length : 0}`);
+        startApp();
+    }
+    
+    function startApp() {
+        const SLOT_LIMITS = {
+            "Голова": 2, "Глаза": 2,
+            "Рука правая": 1, "Рука левая": 1,
+            "Нога правая": 1, "Нога левая": 1,
+            "Торс": 2, "Экзотика": 1
+        };
+        
+        const SKILLS_LIST = ["BS","WS","STR","T","AG","INT","PER","INF","TECH","NET","KNW","SURV"];
+        const SKILL_NAMES = {BS:"Стрельба",WS:"Ближний бой",STR:"Сила",T:"Выносливость",AG:"Ловкость",INT:"Интеллект",PER:"Восприятие",INF:"Влияние",TECH:"Техника",NET:"Сеть",KNW:"Знания",SURV:"Выживание"};
+        
+        let character = {
+            name: "Новый боец", level: 1,
+            race: null, raceOrigin: null, beastLine: null, selectedSkills: [],
+            class: null, specializations: [],
+            baseSkills: {BS:0,WS:0,STR:0,T:0,AG:0,INT:0,PER:0,INF:0,TECH:0,NET:0,KNW:0,SURV:0},
+            spentPoints: 0,
+            currentHP: 10, maxHP: 10, 
+            equippedArmor: null, equippedWeapon: null,
+            implants: [], inventory: [],
+            background: null, contact: null, conditions: [], levelHistory: []
+        };
+        let activeTab = "race";
+        let rollResult = null;
+        
+        function getClassData() { return CLASSES_DATA.find(c => c.id === character.class); }
+        
+        function getAvailableAbilities() {
+            const classData = getClassData();
+            if (!classData || !classData.abilities) return [];
+            return classData.abilities.filter(ab => ab.level <= character.level);
+        }
+        
+        function getAvailableSpecAbilities() {
+            const classData = getClassData();
+            if (!classData || !classData.specializations) return [];
+            const result = [];
+            for (const spec of classData.specializations) {
+                if (character.specializations.includes(spec.name) && spec.abilities) {
+                    for (const ab of spec.abilities) {
+                        if (ab.level <= character.level) result.push({...ab, specName: spec.name});
+                    }
+                }
+            }
+            return result;
+        }
+        
+        function getRaceBonuses() {
+            let bonuses = {};
+            const race = RACES_DATA.find(r => r.id === character.race);
+            if (!race) return bonuses;
+            if (race.bonus_type === "fixed" && race.bonus_skills) Object.assign(bonuses, race.bonus_skills);
+            if (race.bonus_type === "fixed_plus_choice" && race.bonus_skills) Object.assign(bonuses, race.bonus_skills);
+            if (race.bonus_type === "fixed_plus_line" && race.bonus_skills) Object.assign(bonuses, race.bonus_skills);
+            if (race.bonus_type === "any_three" && character.selectedSkills) {
+                character.selectedSkills.forEach(skill => { bonuses[skill] = (bonuses[skill] || 0) + 1; });
+            }
+            if ((race.bonus_type === "fixed_plus_choice" || race.bonus_type === "fixed_plus_line") && 
+                character.selectedSkills && race.bonus_choice?.options) {
+                character.selectedSkills.forEach(skill => {
+                    if (race.bonus_choice.options.includes(skill)) bonuses[skill] = (bonuses[skill] || 0) + 1;
+                });
+            }
+            if (character.race === "mutant") {
+                if (character.raceOrigin === "giant") bonuses.STR = (bonuses.STR || 0) + 2;
+                if (character.raceOrigin === "night") bonuses.PER = (bonuses.PER || 0) + 1;
+            }
+            if (character.race === "beastkin" && character.beastLine && race.lines) {
+                const line = race.lines.find(l => l.id === character.beastLine);
+                if (line && line.bonus_skills) Object.assign(bonuses, line.bonus_skills);
+            }
+            return bonuses;
+        }
+        
+        function getTotalSkill(skill) {
+            const bonuses = getRaceBonuses();
+            return (character.baseSkills[skill] || 0) + (bonuses[skill] || 0);
+        }
+        
+        function getMaxSkillForLevel() {
+            let max = LEVEL_MAX_SKILL[character.level] || 6;
+            if (character.race === 'human' && character.level === 1) max = 7;
+            if (character.race === 'ai') max = Math.min(max, 4);
+            if (character.race === 'mutant' && character.raceOrigin === 'giant') max = 12;
+            return max;
+        }
+        
+        function getRaceBonusTotal() {
+            const race = RACES_DATA.find(r => r.id === character.race);
+            if (!race) return 0;
+            let total = 0;
+            if (race.bonus_type === "fixed") {
+                for (let v of Object.values(race.bonus_skills || {})) total += v;
+            }
+            if (race.bonus_type === "fixed_plus_choice") {
+                for (let v of Object.values(race.bonus_skills || {})) total += v;
+                if (race.bonus_choice) total += 1;
+            }
+            if (race.bonus_type === "fixed_plus_line") {
+                for (let v of Object.values(race.bonus_skills || {})) total += v;
+                if (character.beastLine) {
+                    const line = race.lines?.find(l => l.id === character.beastLine);
+                    if (line && line.bonus_skills) {
+                        for (let v of Object.values(line.bonus_skills)) total += v;
+                    }
+                }
+            }
+            if (race.bonus_type === "any_three") total += 3;
+            return total;
+        }
+        
+        function getRemainingPoints() {
+            let total = 30 + getRaceBonusTotal();
+            for (let lvl = 2; lvl <= character.level; lvl++) total += LEVEL_SKILL_POINTS[lvl] || 1;
+            return total - character.spentPoints;
+        }
+        
+        function calculateSU() {
+            let base = getTotalSkill("T") >= 7 ? 2 : (getTotalSkill("T") >= 3 ? 1 : 0);
+            const race = RACES_DATA.find(r => r.id === character.race);
+            let raceSU = race?.su_racial || 0;
+            if (character.raceOrigin === "hardened") raceSU += 1;
+            if (character.beastLine === "heavy") raceSU += 1;
+            let armorSU = 0;
+            if (character.equippedArmor) {
+                const armorItem = ARMOR_DATA.find(a => a.id === character.equippedArmor);
+                if (armorItem) armorSU = armorItem.SU || 0;
+            }
+            let implantSU = character.implants.reduce((s, i) => s + (i.su_bonus || 0), 0);
+            if (character.race === 'crystalkin') raceSU = Math.max(raceSU, 2);
+            if (character.race === 'fused') {
+                if (armorSU > 0) armorSU = 1;
+                if (raceSU < 1) raceSU = 1;
+            }
+            return base + raceSU + armorSU + implantSU;
+        }
+        
+        function calculateMaxHP() {
+            const classData = getClassData();
+            const tVal = getTotalSkill("T");
+            let totalHP = 10 + (tVal * 2);
+            for (let lvl = 1; lvl <= character.level; lvl++) {
+                if (lvl === 1) totalHP += (classData?.hp_start_bonus || 0);
+                else totalHP += 2 + (classData?.hp_per_level || 2);
+            }
+            return totalHP;
+        }
+        
+        function calculateAlienation() {
+            let total = character.implants.reduce((s, i) => s + (i.alienation || 0), 0);
+            if (character.race === 'fused') total = Math.ceil(total / 2);
+            if (character.race === 'golem' || character.race === 'ai') return 0;
+            return Math.min(total, 100);
+        }
+        
+        function getAlienationStage(alienation) {
+            const stages = window.ALIENATION_STAGES;
+            for (let i = 0; i < stages.length; i++) {
+                if (alienation <= stages[i].max) return stages[i];
+            }
+            return stages[stages.length - 1];
+        }
+        
+        function canLevelUp() { return character.level < 10 && getRemainingPoints() >= 0; }
+        
+        function toggleSkillSelection(skill) {
+            const race = RACES_DATA.find(r => r.id === character.race);
+            const maxSelections = (race?.bonus_type === "any_three") ? 3 : 1;
+            if (character.selectedSkills.includes(skill)) {
+                character.selectedSkills = character.selectedSkills.filter(s => s !== skill);
+            } else if (character.selectedSkills.length < maxSelections) {
+                character.selectedSkills.push(skill);
+            } else {
+                alert(`Максимум выбранных навыков: ${maxSelections}`);
+                return;
+            }
+            render();
+        }
+        
+        function levelUp() {
+            if (character.level >= 10) { alert("Максимальный уровень (10)!"); return; }
+            character.level++;
+            character.maxHP = calculateMaxHP();
+            character.currentHP = character.maxHP;
+            character.levelHistory.unshift({level: character.level, action: `Повышение до ${character.level} уровня`, date: new Date().toLocaleString()});
+            if (LEVELS_WITH_SPEC.includes(character.level) && getClassData()?.specializations) {
+                const availableSpecs = getClassData().specializations.map(s => s.name);
+                const newSpecs = availableSpecs.filter(s => !character.specializations.includes(s));
+                if (newSpecs.length > 0) alert(`Вы достигли ${character.level} уровня! Вы можете выбрать специализацию: ${newSpecs.join(", ")}`);
+            }
+            const newAbilities = getClassData()?.abilities.filter(ab => ab.level === character.level) || [];
+            if (newAbilities.length > 0) alert(`Новая способность: ${newAbilities.map(ab => ab.name).join(", ")}`);
+            save(); render();
+            alert(`Уровень повышен до ${character.level}!`);
+        }
+        
+        function addSpecialization(specName) {
+            if (!character.specializations.includes(specName)) {
+                character.specializations.push(specName);
+                save(); render();
+            }
+        }
+        
+        function getRarityClass(rarity) {
+            switch(rarity) {
+                case 'common': return 'rarity-common';
+                case 'uncommon': return 'rarity-uncommon';
+                case 'rare': return 'rarity-rare';
+                case 'legendary': return 'rarity-legendary';
+                default: return '';
+            }
+        }
+        
+        function getImplantEffectText(implant) {
+            if (!implant.effect) return '';
+            let text = implant.effect;
+            if (implant.su_bonus) text += ` [+${implant.su_bonus} СУ]`;
+            return text;
+        }
+        
+        function addImplant(implant) {
+            let slot = implant.slot;
+            if (slot === "Рука") {
+                const side = confirm("Установить в правую руку? (OK — правая, Отмена — левая)");
+                slot = side ? "Рука правая" : "Рука левая";
+            } else if (slot === "Нога") {
+                const side = confirm("Установить в правую ногу? (OK — правая, Отмена — левая)");
+                slot = side ? "Нога правая" : "Нога левая";
+            }
+            const current = character.implants.filter(i => i.equippedSlot === slot).length;
+            const max = SLOT_LIMITS[slot] || 1;
+            if (current >= max) { alert(`Слот ${slot} заполнен (макс. ${max})`); return false; }
+            character.implants.push({...implant, equippedSlot: slot});
+            save(); render();
+            return true;
+        }
+        
+        function removeImplant(index) { character.implants.splice(index, 1); save(); render(); }
+        
+        function getWeaponStatsText(w) {
+            let stats = [];
+            if (w.damage) stats.push(`💥 ${w.damage}`);
+            if (w.S_vs_tech !== undefined && w.S_vs_tech !== null && w.S_vs_tech !== "особый") stats.push(`🎯 S${w.S_vs_tech}`);
+            if (w.range) stats.push(`📏 ${w.range === "Касание" ? "касание" : w.range}`);
+            if (w.hands) stats.push(`✋ ${w.hands === 1 ? '1 рука' : '2 руки'}`);
+            if (w.price) stats.push(`💰 ${w.price} Вт`);
+            return stats.join(' | ');
+        }
+        
+        function getArmorStatsText(a) { return `🛡️ СУ:${a.SU} | 📋 ${a.class || 'П?'} | 💰 ${a.price} Вт`; }
+        function getArmorPropertiesText(a) { return a.properties?.join(', ') || ''; }
+        
+        function save() { localStorage.setItem("de_character", JSON.stringify(character)); }
+        function load() { 
+            const s = localStorage.getItem("de_character"); 
+            if(s) { 
+                try { 
+                    const loaded = JSON.parse(s);
+                    character = {...character, ...loaded};
+                    if (character.currentHP > character.maxHP) character.currentHP = character.maxHP;
+                } catch(e) {} 
+            } 
+            render(); 
+        }
+        
+        // Глобальные функции
+        window.setTab = (t) => { activeTab = t; render(); };
+        window.toggleSkillSelection = toggleSkillSelection;
+        window.setRace = (r) => { 
+            character.race = r; 
+            character.raceOrigin = null; 
+            character.beastLine = null; 
+            character.selectedSkills = []; 
+            character.baseSkills = {BS:0,WS:0,STR:0,T:0,AG:0,INT:0,PER:0,INF:0,TECH:0,NET:0,KNW:0,SURV:0}; 
+            character.spentPoints = 0; 
+            render(); 
+        };
+        window.setRaceOrigin = (o) => { character.raceOrigin = o; render(); };
+        window.setBeastLine = (l) => { character.beastLine = l; render(); };
+        window.setClass = (c) => { 
+            character.class = c; 
+            character.specializations = [];
+            character.maxHP = calculateMaxHP(); 
+            if (character.currentHP > character.maxHP) character.currentHP = character.maxHP;
+            render(); 
+        };
+        window.updateName = (n) => { character.name = n; save(); render(); };
+        window.modifyHP = (d) => { 
+            character.currentHP = Math.min(Math.max(0, character.currentHP + d), character.maxHP); 
+            save(); render(); 
+        };
+        window.toggleCondition = (c) => { 
+            if(character.conditions.includes(c)) character.conditions = character.conditions.filter(x => x !== c);
+            else character.conditions.push(c);
+            save(); render(); 
+        };
+        window.updateSkill = (skill, value) => {
+            const newVal = parseInt(value);
+            const oldBase = character.baseSkills[skill] || 0;
+            const delta = newVal - oldBase;
+            const remaining = getRemainingPoints();
+            const maxForLevel = getMaxSkillForLevel();
+            if (remaining - delta >= 0 && newVal <= maxForLevel && newVal <= 10) {
+                character.baseSkills[skill] = newVal;
+                character.spentPoints += delta;
+                character.maxHP = calculateMaxHP();
+                if (character.currentHP > character.maxHP) character.currentHP = character.maxHP;
+                save(); render();
+            } else if (newVal > maxForLevel) {
+                alert(`Максимум навыка для ${character.level} уровня: ${maxForLevel}`);
+            } else {
+                alert(`Недостаточно очков навыков! Осталось: ${remaining}`);
+            }
+        };
+        window.quickRoll = (s) => { 
+            const val = getTotalSkill(s); 
+            const roll = Math.floor(Math.random() * 10) + 1; 
+            const target = val>=9?2:val>=7?3:val>=5?4:val>=3?5:6; 
+            const success = roll >= target; 
+            rollResult = `${s}: ${roll} vs ${target} → ${success ? '✓' : '✗'}`; 
+            render(); 
+            setTimeout(() => { rollResult = null; render(); }, 2000); 
+        };
+        window.levelUp = levelUp;
+        window.addSpecialization = addSpecialization;
+        window.addImplant = addImplant;
+        window.removeImplant = removeImplant;
+        
+        window.addItem = (item, type) => { character.inventory.push({...item, type, addedAt: Date.now()}); save(); render(); };
+        window.equipArmor = (armorId) => { character.equippedArmor = armorId; save(); render(); };
+        window.equipWeapon = (weaponId) => { character.equippedWeapon = weaponId; save(); render(); };
+        window.removeItem = (index) => {
+            const item = character.inventory[index];
+            if (character.equippedArmor === item.id) character.equippedArmor = null;
+            if (character.equippedWeapon === item.id) character.equippedWeapon = null;
+            character.inventory.splice(index, 1);
+            save(); render();
+        };
+        
+        window.addImplantFromSelect = () => { 
+            const sel = document.getElementById('implantSelect'); 
+            if(sel && sel.value) { 
+                window.addImplant(JSON.parse(sel.value)); 
+                sel.value = ""; 
+            } 
+        };
+        window.addCustomImplant = () => { 
+            const name = prompt("Название:"); if(!name) return; 
+            const slot = prompt("Слот (Голова/Глаза/Рука/Нога/Торс/Экзотика):"); if(!slot) return; 
+            const alienation = parseInt(prompt("% отчуждения:", "5")) || 5; 
+            const price = parseInt(prompt("Цена:", "100")) || 100;
+            window.addImplant({id:"custom_"+Date.now(),name,slot,alienation,price,su_bonus:0,effect:"Кастомный имплантат"}); 
+        };
+        window.addCustomItem = () => { 
+            const name = prompt("Название:"); if(!name) return; 
+            const price = parseInt(prompt("Цена:", "0")) || 0; 
+            window.addItem({id:"custom_"+Date.now(),name,price,isCustom:true}, 'custom'); 
+        };
+        
+        window.addSelectedWeapon = () => {
+            const sel = document.getElementById('weaponSelect');
+            if (sel && sel.value) { window.addItem(JSON.parse(sel.value), 'weapon'); sel.value = ""; }
+        };
+        window.addSelectedArmor = () => {
+            const sel = document.getElementById('armorSelect');
+            if (sel && sel.value) { window.addItem(JSON.parse(sel.value), 'armor'); sel.value = ""; }
+        };
+        window.addSelectedConsumable = () => {
+            const sel = document.getElementById('consumableSelect');
+            if (sel && sel.value) { window.addItem(JSON.parse(sel.value), 'consumable'); sel.value = ""; }
+        };
+        
+        window.resetChar = () => { 
+            if(confirm("Сбросить персонажа?")) { 
+                character = { 
+                    name: "Новый боец", level: 1,
+                    race: null, raceOrigin: null, beastLine: null, selectedSkills: [],
+                    class: null, specializations: [],
+                    baseSkills: {BS:0,WS:0,STR:0,T:0,AG:0,INT:0,PER:0,INF:0,TECH:0,NET:0,KNW:0,SURV:0},
+                    spentPoints: 0,
+                    currentHP: 10, maxHP: 10,
+                    equippedArmor: null, equippedWeapon: null,
+                    implants: [], inventory: [],
+                    background: null, contact: null, conditions: [], levelHistory: []
+                }; 
+                save(); render(); 
+            } 
+        };
+        window.exportChar = () => { 
+            const a = document.createElement('a'); 
+            a.href = URL.createObjectURL(new Blob([JSON.stringify(character,null,2)], {type:"application/json"})); 
+            a.download = `${character.name}.json`; 
+            a.click(); 
+        };
+        window.importChar = () => { 
+            const input = document.createElement('input'); 
+            input.type = 'file'; 
+            input.accept = 'application/json'; 
+            input.onchange = (e) => { 
+                const file = e.target.files[0]; 
+                const reader = new FileReader(); 
+                reader.onload = (ev) => { 
+                    try { 
+                        character = JSON.parse(ev.target.result); 
+                        save(); render(); 
+                        alert("Импорт успешен!"); 
+                    } catch(e) { alert("Ошибка импорта"); } 
+                }; 
+                reader.readAsText(file); 
+            }; 
+            input.click(); 
+        };
+        
+        window.goToMainMenu = () => { location.href = '../index.html'; };
+        
+        function render() {
+            const app = document.getElementById("app");
+            const hpPercent = (character.currentHP / character.maxHP) * 100;
+            const su = calculateSU();
+            const alienation = calculateAlienation();
+            const alienStage = getAlienationStage(alienation);
+            character.maxHP = calculateMaxHP();
+            const remainingPoints = getRemainingPoints();
+            const maxForLevel = getMaxSkillForLevel();
+            const classData = getClassData();
+            const raceData = RACES_DATA.find(r => r.id === character.race);
+            const raceBonuses = getRaceBonuses();
+            const equippedArmorData = character.equippedArmor ? ARMOR_DATA.find(a => a.id === character.equippedArmor) : null;
+            
+            const implantsBySlot = {
+                "Голова": [], "Глаза": [],
+                "Рука правая": [], "Рука левая": [],
+                "Нога правая": [], "Нога левая": [],
+                "Торс": [], "Экзотика": []
+            };
+            character.implants.forEach((imp, idx) => {
+                const slot = imp.equippedSlot || imp.slot;
+                if (implantsBySlot[slot]) implantsBySlot[slot].push({...imp, idx});
+                else if (slot === "Рука") implantsBySlot["Рука правая"].push({...imp, idx});
+                else if (slot === "Нога") implantsBySlot["Нога правая"].push({...imp, idx});
+                else implantsBySlot["Экзотика"].push({...imp, idx});
+            });
+            
+            // Шапка
+            const headerHtml = `
+                <div class="header">
+                    <div class="logo" onclick="goToMainMenu()">
+                        <h1>⚙️ Инженеры Подземелий</h1>
+                        <p>конструктор персонажа</p>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="action-btn" onclick="exportChar()">📤 Экспорт</button>
+                        <button class="action-btn" onclick="importChar()">📥 Импорт</button>
+                        <button class="action-btn" onclick="resetChar()">🔄 Сброс</button>
+                        <button class="back-menu-btn" onclick="goToMainMenu()">🏠 Главное меню</button>
+                    </div>
+                </div>
+            `;
+            
+            // Расы
+            let racesHtml = `<h3>🌍 Выбор расы</h3><div class="grid-2">`;
+            RACES_DATA.forEach(race => {
+                racesHtml += `<div class="class-card ${character.race === race.id ? 'selected' : ''}" onclick="setRace('${race.id}')">
+                    <h4>${race.name}</h4>
+                    <small>${typeof race.trait === 'object' ? race.trait.name : (race.trait || 'Особенность')}</small>
+                </div>`;
+            });
+            racesHtml += `</div>`;
+            
+            if (character.race === "mutant" && raceData?.origins) {
+                racesHtml += `<h3>Происхождение мутанта</h3><div class="grid-2">`;
+                raceData.origins.forEach(o => {
+                    racesHtml += `<div class="class-card ${character.raceOrigin === o.id ? 'selected' : ''}" onclick="setRaceOrigin('${o.id}')">
+                        <h4>${o.name}</h4><small>${o.effects?.join(', ') || ''}</small>
+                    </div>`;
+                });
+                racesHtml += `</div>`;
+            }
+            
+            if (character.race === "beastkin" && raceData?.lines) {
+                racesHtml += `<h3>Звериная линия</h3><div class="grid-2">`;
+                raceData.lines.forEach(l => {
+                    racesHtml += `<div class="class-card ${character.beastLine === l.id ? 'selected' : ''}" onclick="setBeastLine('${l.id}')">
+                        <h4>${l.name}</h4><small>${l.effects?.join(', ') || ''}</small>
+                    </div>`;
+                });
+                racesHtml += `</div>`;
+            }
+            
+            if (character.race === "human") {
+                racesHtml += `<h3>Выберите 3 навыка для +1</h3><div class="grid-2">`;
+                SKILLS_LIST.forEach(s => {
+                    const isSelected = character.selectedSkills?.includes(s);
+                    racesHtml += `<div class="class-card ${isSelected ? 'selected' : ''}" onclick="toggleSkillSelection('${s}')"><h4>${SKILL_NAMES[s]} (${s})</h4></div>`;
+                });
+                racesHtml += `</div>`;
+            }
+            
+            if (character.race && (character.race === "mutant" || character.race === "homunculus" || character.race === "fused") && raceData?.bonus_choice && character.selectedSkills.length === 0) {
+                racesHtml += `<h3>Выберите +1 к навыку</h3><div class="grid-2">`;
+                raceData.bonus_choice.options.forEach(opt => {
+                    const isSelected = character.selectedSkills?.includes(opt);
+                    racesHtml += `<div class="class-card ${isSelected ? 'selected' : ''}" onclick="toggleSkillSelection('${opt}')"><h4>${SKILL_NAMES[opt]} (${opt})</h4></div>`;
+                });
+                racesHtml += `</div>`;
+            }
+            
+            if (character.race && Object.keys(raceBonuses).length > 0) {
+                racesHtml += `<div style="margin-top:16px; padding:12px; background:#1a1a1a; border-radius:8px;">
+                    <strong>🎯 Бонусы расы:</strong><br>
+                    ${Object.entries(raceBonuses).map(([sk, val]) => `${SKILL_NAMES[sk]} +${val}`).join(', ')}
+                </div>`;
+            }
+            
+            // Навыки
+            let skillsHtml = `<div class="points-left">🎯 Очки навыков: ${remainingPoints} осталось | Макс. навык: ${maxForLevel}</div>
+                              <div class="skills-grid">`;
+            for (let [sk, name] of Object.entries(SKILL_NAMES)) {
+                const total = getTotalSkill(sk);
+                const base = character.baseSkills[sk] || 0;
+                const bonus = total - base;
+                const overMax = total > maxForLevel;
+                skillsHtml += `<div class="skill-row">
+                    <span class="skill-name">${name} (${sk})</span>
+                    <input type="range" class="skill-slider" min="0" max="10" value="${base}" onchange="updateSkill('${sk}', this.value)">
+                    <span class="skill-value">${total}</span>
+                    <span class="skill-target">${total>=9?"2+":total>=7?"3+":total>=5?"4+":total>=3?"5+":"6+"}</span>
+                    ${bonus > 0 ? `<span class="skill-base">+${bonus}</span>` : ''}
+                    ${overMax ? `<span class="skill-max-warning">⚠️ превышает ${maxForLevel}</span>` : ''}
+                </div>`;
+            }
+            skillsHtml += `</div>`;
+            
+            // Классы
+            let classesHtml = `<h3>🤖 Выбор класса</h3><div class="grid-2">`;
+            CLASSES_DATA.forEach(cls => {
+                classesHtml += `<div class="class-card ${character.class === cls.id ? 'selected' : ''}" onclick="setClass('${cls.id}')">
+                    <h4>${cls.name}</h4>
+                    <small>❤️ +${cls.hp_start_bonus} ХП | +${cls.hp_per_level}/ур</small>
+                </div>`;
+            });
+            classesHtml += `</div>`;
+            
+            // Способности
+            let abilitiesHtml = `<h3>⚡ Способности класса (доступны с ${character.level} уровня)</h3>`;
+            const availableAbilities = getAvailableAbilities();
+            if (availableAbilities.length > 0) {
+                availableAbilities.forEach(ab => {
+                    const isNew = ab.level === character.level;
+                    abilitiesHtml += `<div class="ability-card ${isNew ? 'ability-new' : ''}">
+                        <h5>[${ab.level}] ${ab.name} ${isNew ? '<span style="color:#2ecc71;">✦ НОВОЕ!</span>' : ''}</h5>
+                        <small>${ab.type === 'passive' ? '🔹 Пассивная' : (ab.type === 'active' ? '🔸 Активная' : '🔻 Реакция')}</small>
+                        <p><small>${ab.description || 'Описание'}</small></p>
+                        ${ab.uses ? `<small>📊 Использований: ${ab.uses}</small>` : ''}
+                        ${ab.duration ? `<small>⏱️ Длительность: ${ab.duration}</small>` : ''}
+                    </div>`;
+                });
+            } else {
+                abilitiesHtml += `<div class="ability-card locked">Нет доступных способностей. Повышайте уровень!</div>`;
+            }
+            
+            if (classData?.specializations) {
+                abilitiesHtml += `<h3>🎯 Специализации</h3><div>`;
+                classData.specializations.forEach(spec => {
+                    const isSelected = character.specializations.includes(spec.name);
+                    const isAvailable = character.level >= 3;
+                    abilitiesHtml += `<button class="spec-badge ${isSelected ? 'active' : ''}" onclick="addSpecialization('${spec.name}')" ${!isAvailable ? 'disabled style="opacity:0.5;"' : ''}>${spec.name}</button>`;
+                });
+                abilitiesHtml += `</div>`;
+            }
+            
+            // Импланты
+            let implantsHtml = `<h3>🦾 Имплантаты (Отчуждение: ${alienation}%)</h3>
+            <div class="alienation-container">
+                <div class="alienation-bar"><div class="alienation-fill" style="width:${alienation}%; background:${alienation>90?'#e74c3c':alienation>70?'#e74c3c':alienation>50?'#f39c12':alienation>30?'#f39c12':alienation>15?'#2ecc71':'#2ecc71'}"></div></div>
+                <div class="alienation-stage">📊 ${alienStage.stage}: ${alienStage.effect}</div>
+            </div>
+            <div class="human-body"><svg class="body-svg" viewBox="0 0 200 300" style="width:180px;">
+                <rect x="75" y="10" width="50" height="50" rx="10" class="body-slot ${implantsBySlot.Голова.length ? 'has-implant' : ''}"/>
+                <text x="100" y="40" text-anchor="middle" fill="#888" font-size="8">Голова</text>
+                <circle cx="60" cy="80" r="15" class="body-slot ${implantsBySlot.Глаза.length ? 'has-implant' : ''}"/>
+                <circle cx="140" cy="80" r="15" class="body-slot ${implantsBySlot.Глаза.length ? 'has-implant' : ''}"/>
+                <rect x="70" y="100" width="60" height="80" rx="10" class="body-slot ${implantsBySlot.Торс.length ? 'has-implant' : ''}"/>
+                <rect x="30" y="110" width="30" height="60" rx="5" class="body-slot ${implantsBySlot["Рука правая"].length ? 'has-implant' : ''}"/>
+                <rect x="140" y="110" width="30" height="60" rx="5" class="body-slot ${implantsBySlot["Рука левая"].length ? 'has-implant' : ''}"/>
+                <rect x="30" y="190" width="30" height="60" rx="5" class="body-slot ${implantsBySlot["Нога правая"].length ? 'has-implant' : ''}"/>
+                <rect x="140" y="190" width="30" height="60" rx="5" class="body-slot ${implantsBySlot["Нога левая"].length ? 'has-implant' : ''}"/>
+                <rect x="85" y="260" width="30" height="20" rx="5" class="body-slot ${implantsBySlot.Экзотика.length ? 'has-implant' : ''}"/>
+                <text x="100" y="275" text-anchor="middle" fill="#888" font-size="6">Экзотика</text>
+            </svg></div>
+            <div class="body-parts">`;
+            
+            for (let [slot, limit] of Object.entries(SLOT_LIMITS)) {
+                const implantsList = implantsBySlot[slot] || [];
+                implantsHtml += `<div class="body-part">
+                    <h4>${slot}</h4>
+                    <div class="slot-limit">${implantsList.length}/${limit}</div>
+                    <div class="implants-in-slot">`;
+                implantsList.forEach(imp => {
+                    implantsHtml += `<div class="implant-badge">
+                        <strong>${imp.name}</strong> (${imp.alienation || 0}%)<br>
+                        <small>${getImplantEffectText(imp)}</small>
+                        <button class="remove-imp" onclick="removeImplant(${imp.idx})">✖</button>
+                    </div>`;
+                });
+                implantsHtml += `</div></div>`;
+            }
+            implantsHtml += `</div>
+            <select id="implantSelect" class="weapon-select" onchange="addImplantFromSelect()">
+                <option value="">— Добавить имплантат —</option>
+                ${(IMPLANTS_DATA || []).map(i => `<option value='${JSON.stringify(i)}'>${i.name} (${i.slot}, ${i.alienation || 0}% отч., ${i.price} Вт)</option>`).join('')}
+            </select>
+            <button class="btn-secondary" onclick="addCustomImplant()">⚙️ + Кастомный имплантат</button>`;
+            
+            // Инвентарь
+            let inventoryHtml = `<h3>🎒 Инвентарь</h3>
+            <div style="background:#1a1a1a; padding:8px; border-radius:8px; margin-bottom:12px;">
+                <div><strong>⚔️ Экипировано:</strong></div>
+                <div>🛡️ Броня: ${equippedArmorData ? `<span class="${getRarityClass(equippedArmorData.rarity)}">${equippedArmorData.name}</span> (${equippedArmorData.class || 'П?'}, СУ:${equippedArmorData.SU})` : 'нет'}</div>
+                <div>🔫 Оружие: ${character.equippedWeapon ? (WEAPONS_DATA.find(w=>w.id===character.equippedWeapon)?.name || character.equippedWeapon) : 'нет'}</div>
+            </div>
+            <div class="inventory-list">`;
+            
+            character.inventory.forEach((item, idx) => {
+                let stats = "", properties = "";
+                if (item.damage) {
+                    stats = getWeaponStatsText(item);
+                    properties = item.properties?.join(', ') || '';
+                } else if (item.SU !== undefined) {
+                    stats = getArmorStatsText(item);
+                    properties = getArmorPropertiesText(item);
+                } else if (item.effect) {
+                    stats = `✨ ${item.effect} | 💰 ${item.price || 0} Вт`;
+                }
+                const isArmor = item.SU !== undefined;
+                const isWeapon = item.damage !== undefined;
+                const isEquippedArmor = character.equippedArmor === item.id;
+                const isEquippedWeapon = character.equippedWeapon === item.id;
+                
+                inventoryHtml += `<div class="inv-item">
+                    <div class="inv-item-info">
+                        <span class="inv-item-name ${getRarityClass(item.rarity)}">${item.name}${isEquippedArmor ? ' ⚔️' : ''}${isEquippedWeapon ? ' 🔫' : ''}</span>
+                        ${isArmor ? `<button class="equipped-badge" onclick="equipArmor('${item.id}')">⚔️ Экипировать</button>` : ''}
+                        ${isWeapon ? `<button class="equipped-badge" onclick="equipWeapon('${item.id}')">🔫 В руку</button>` : ''}
+                        <div class="inv-item-stats">${stats}</div>
+                        ${properties ? `<div class="inv-item-stats">✨ ${properties}</div>` : ''}
+                    </div>
+                    <button class="remove-item" onclick="removeItem(${idx})">✖</button>
+                </div>`;
+            });
+            
+            inventoryHtml += `</div>
+            <hr><h4>📦 Добавить предмет</h4>
+            <select id="weaponSelect" class="weapon-select" onchange="addSelectedWeapon()"><option value="">— Добавить оружие —</option>
+                ${WEAPONS_DATA.map(w => `<option value='${JSON.stringify(w)}'>${w.name} — ${w.damage} | ${w.price}Вт</option>`).join('')}
+            </select>
+            <select id="armorSelect" class="armor-select" onchange="addSelectedArmor()"><option value="">— Добавить броню —</option>
+                ${ARMOR_DATA.map(a => `<option value='${JSON.stringify(a)}'>${a.name} — ${a.class || 'П?'} | СУ:${a.SU} | ${a.price}Вт</option>`).join('')}
+            </select>
+            <select id="consumableSelect" class="consumable-select" onchange="addSelectedConsumable()"><option value="">— Добавить расходник —</option>
+                ${CONSUMABLES_DATA.map(c => `<option value='${JSON.stringify(c)}'>${c.name} — ${c.effect || ''} | ${c.price}Вт</option>`).join('')}
+            </select>
+            <button class="btn-secondary" onclick="addCustomItem()">⚙️ + Кастомный предмет</button>`;
+            
+            // История
+            let historyHtml = `<div class="history-list">`;
+            if (character.levelHistory.length === 0) {
+                historyHtml += `<div class="history-item">Нет записей. Повышайте уровень!</div>`;
+            } else {
+                character.levelHistory.forEach(entry => {
+                    historyHtml += `<div class="history-item"><strong>Уровень ${entry.level}</strong><br><small>${entry.date || ''}</small></div>`;
+                });
+            }
+            historyHtml += `</div>`;
+            
+            const html = headerHtml + `
+                <div class="main-layout">
+                    <div class="sidebar">
+                        <div class="char-card">
+                            <input class="char-name-input" value="${character.name}" onchange="updateName(this.value)">
+                            <div class="char-level">Уровень ${character.level}</div>
+                            <button class="level-up-btn" onclick="levelUp()" ${!canLevelUp() && character.level < 10 ? 'style="opacity:0.5;"' : ''}>⬆️ Повысить уровень</button>
+                            <div class="level-progress"><div class="level-progress-fill" style="width:${(character.level-1)*10}%"></div></div>
+                        </div>
+                        <div class="stat-grid">
+                            <div class="stat-item"><div class="stat-label">❤️ ХП</div><div class="stat-value">${character.currentHP}/${character.maxHP}</div></div>
+                            <div class="stat-item"><div class="stat-label">🛡️ СУ</div><div class="stat-value">${su}</div></div>
+                            <div class="stat-item"><div class="stat-label">⚡ Инициатива</div><div class="stat-value">+${getTotalSkill("AG")}</div></div>
+                            <div class="stat-item"><div class="stat-label">🏃 Скорость</div><div class="stat-value">9 м</div></div>
+                        </div>
+                        <div class="hp-manager">
+                            <div class="hp-bar"><div class="hp-fill ${hpPercent>50?'green':hpPercent>25?'yellow':'red'}" style="width:${hpPercent}%"></div></div>
+                            <div class="hp-controls">
+                                <button class="hp-btn" onclick="modifyHP(-10)">-10</button><button class="hp-btn" onclick="modifyHP(-5)">-5</button>
+                                <button class="hp-btn" onclick="modifyHP(-1)">-1</button><button class="hp-btn" onclick="modifyHP(1)">+1</button>
+                                <button class="hp-btn" onclick="modifyHP(5)">+5</button><button class="hp-btn" onclick="modifyHP(10)">+10</button>
+                            </div>
+                        </div>
+                        <div class="conditions">
+                            <div class="condition-badge ${character.conditions.includes('Ранен')?'active':''}" onclick="toggleCondition('Ранен')">🏥 Ранен</div>
+                            <div class="condition-badge ${character.conditions.includes('Отравлен')?'active':''}" onclick="toggleCondition('Отравлен')">☠️ Отравлен</div>
+                            <div class="condition-badge ${character.conditions.includes('Испуган')?'active':''}" onclick="toggleCondition('Испуган')">😨 Испуган</div>
+                        </div>
+                        <div class="quick-rolls">
+                            <div>Быстрые броски</div>
+                            ${SKILLS_LIST.map(s => `<button class="roll-btn" onclick="quickRoll('${s}')">${s}</button>`).join('')}
+                        </div>
+                        ${rollResult ? `<div class="roll-result">${rollResult}</div>` : ''}
+                    </div>
+                    <div class="content">
+                        <div class="tabs">
+                            <button class="tab-btn ${activeTab==='race'?'active':''}" onclick="setTab('race')">🌍 Раса</button>
+                            <button class="tab-btn ${activeTab==='skills'?'active':''}" onclick="setTab('skills')">📊 Навыки</button>
+                            <button class="tab-btn ${activeTab==='class'?'active':''}" onclick="setTab('class')">🤖 Класс</button>
+                            <button class="tab-btn ${activeTab==='abilities'?'active':''}" onclick="setTab('abilities')">⚡ Способности</button>
+                            <button class="tab-btn ${activeTab==='implants'?'active':''}" onclick="setTab('implants')">🦾 Импланты</button>
+                            <button class="tab-btn ${activeTab==='gear'?'active':''}" onclick="setTab('gear')">🎒 Снаряжение</button>
+                            <button class="tab-btn ${activeTab==='history'?'active':''}" onclick="setTab('history')">📜 История</button>
+                        </div>
+                        <div id="tab-race" class="tab-content ${activeTab==='race'?'active':''}">${racesHtml}</div>
+                        <div id="tab-skills" class="tab-content ${activeTab==='skills'?'active':''}">${skillsHtml}</div>
+                        <div id="tab-class" class="tab-content ${activeTab==='class'?'active':''}">${classesHtml}</div>
+                        <div id="tab-abilities" class="tab-content ${activeTab==='abilities'?'active':''}">${abilitiesHtml}</div>
+                        <div id="tab-implants" class="tab-content ${activeTab==='implants'?'active':''}">${implantsHtml}</div>
+                        <div id="tab-gear" class="tab-content ${activeTab==='gear'?'active':''}">${inventoryHtml}</div>
+                        <div id="tab-history" class="tab-content ${activeTab==='history'?'active':''}">${historyHtml}</div>
+                    </div>
+                </div>
+            `;
+            app.innerHTML = html;
+        }
+        
+        character.maxHP = calculateMaxHP();
+        character.currentHP = character.maxHP;
+        load();
+    }
+    
+    init();
+</script>
+</body>
+</html>

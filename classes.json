@@ -1,0 +1,256 @@
+{
+  "classes": [
+    {
+      "id": "hardware_engineer",
+      "name": "Железячник",
+      "name_en": "Hardware Engineer",
+      "role": "Танк, крафтер, мастер импровизации",
+      "description": "Железячник — это ходячая крепость и передвижная мастерская. Там, где другие видят груду металлолома, Железячник видит будущий мех. Там, где другие отступают, Железячник встаёт и принимает удар на себя. Его тело — инструмент, его кровь — машинное масло, его вера — в прочность стали и надёжность сварного шва.",
+      "key_skills": ["STR", "T", "TECH"],
+      "hp_start_bonus": 6,
+      "hp_per_level": 4,
+      "starting_skills": {"BS": 3, "WS": 5, "STR": 6, "T": 5, "AG": 2, "INT": 3, "PER": 2, "INF": 1, "TECH": 4, "NET": 1, "KNW": 1, "SURV": 2},
+      "abilities": [
+        {"level": 1, "name": "Шкала Поглощения", "type": "passive", "description": "При получении урона Шкала заполняется на величину полученного урона (максимум 10 зарядов). Заряды можно потратить свободным действием: 5 — +1d6 ХП, 4 — +2 СУ, 3 — +1 пробитие, 8 — ударная волна 2d6."},
+        {"level": 1, "name": "Пробитие кулаком", "type": "passive", "description": "В ближнем бою против техники использует свой STR как S оружия."},
+        {"level": 1, "name": "Перегрузка", "type": "active", "uses": "2 раза в день", "duration": "1 минута", "description": "Сопротивление физическому урону, +1 к S. Помеха на AG (скрытность)."},
+        {"level": 2, "name": "Экстренный ремонт", "type": "active", "uses": "1 раз в день", "description": "Восстанавливает 2d8 ХП технике. Требуется ремонтный набор."},
+        {"level": 5, "name": "Двойная атака", "type": "passive", "description": "Две атаки в ближнем бою за одно основное действие."},
+        {"level": 9, "name": "Несокрушимость", "type": "passive", "uses": "1 раз в день", "description": "При 0 ХП остаётся на 1 ХП."},
+        {"level": 10, "name": "Живая Крепость", "type": "active", "uses": "1 раз в день", "duration": "3 раунда", "description": "СУ удваивается, иммунитет к отбрасыванию. Союзники в 2 м: +1 СУ."}
+      ],
+      "specializations": [
+        {"id": "blacksmith", "name": "Кузнец", "description": "Мастер ремонта и усиления брони.",
+          "abilities": [
+            {"level": 3, "name": "Мастер ремонта", "effect": "Преимущество на TECH при ремонте.", "type": "passive"},
+            {"level": 6, "name": "Усиление брони", "effect": "+1 ТБ союзному меху (3/день, 2 раунда).", "type": "active"},
+            {"level": 9, "name": "Шедевр", "effect": "Бесплатная модификация раз в месяц.", "type": "passive"}
+          ]},
+        {"id": "berserker", "name": "Берсерк", "description": "Неудержимый боец, крушит врагов.",
+          "abilities": [
+            {"level": 3, "name": "Крушащий удар", "effect": "+1 S в ближнем бою.", "type": "passive"},
+            {"level": 6, "name": "Устрашение", "effect": "Крит — Испуг врагам в 2 м.", "type": "passive"},
+            {"level": 9, "name": "Безжалостный", "effect": "В Перегрузке игнорирует половину СУ.", "type": "passive"}
+          ]}
+      ]
+    },
+    {
+      "id": "network_rogue",
+      "name": "Связист",
+      "name_en": "Network Rogue",
+      "role": "Разведчик, оператор эфира, контроллер",
+      "description": "Связист — это глаза и уши отряда. Он слышит то, что другие не слышат, видит то, что другие не видят, и знает то, что другие не знают. В бою он не лезет вперёд — он управляет полем боя, подсвечивает цели, глушит вражескую связь и наносит смертельные удары из тени.",
+      "key_skills": ["BS", "AG", "PER", "NET"],
+      "hp_start_bonus": 2,
+      "hp_per_level": 2,
+      "starting_skills": {"BS": 5, "WS": 2, "STR": 2, "T": 3, "AG": 5, "INT": 3, "PER": 4, "INF": 2, "TECH": 2, "NET": 4, "KNW": 2, "SURV": 2},
+      "abilities": [
+        {"level": 1, "name": "Скрытая атака", "type": "passive", "description": "+1d6 урона (2d6 на 3 ур., 3d6 на 5, 4d6 на 7, 5d6 на 9). Против мехов — с ПТ-оружием или по уязвимым точкам."},
+        {"level": 1, "name": "Частоты", "type": "active", "action": "Бонусное действие", "description": "Шёпот: AG. Крик: помеха врагам. Эхо: предвидение. Шторм: +1 пробитие союзникам."},
+        {"level": 1, "name": "Подсветка", "type": "active", "uses": "3+PER/2 в день", "description": "Цель — союзники с преимуществом на пробитие."},
+        {"level": 2, "name": "Хитрый манёвр", "type": "active", "action": "Бонусное действие", "description": "Рывок, Отход или Спрятаться бонусным действием."},
+        {"level": 5, "name": "Уклонение", "type": "reaction", "description": "Реакция: половина урона от видимой атаки."},
+        {"level": 9, "name": "Мастер эфира", "type": "passive", "description": "Две Частоты одновременно."},
+        {"level": 10, "name": "Призрак в Машине", "type": "active", "uses": "1 раз в день", "description": "Невидимость 2 раунда + автокрит."}
+      ],
+      "specializations": [
+        {"id": "ghost", "name": "Призрак", "description": "Мастер скрытности и невидимости.",
+          "abilities": [
+            {"level": 3, "name": "Бесшумный шаг", "effect": "Преимущество на AG в темноте.", "type": "passive"},
+            {"level": 6, "name": "Исчезновение", "effect": "Реакция: невидимость + телепорт 5 м (1/отдых).", "type": "reaction"},
+            {"level": 9, "name": "Смертельный шёпот", "effect": "Скрытая атака +2d6 против невидящей цели.", "type": "passive"}
+          ]},
+        {"id": "saboteur", "name": "Диверсант", "description": "Специалист по ловушкам и взрывчатке.",
+          "abilities": [
+            {"level": 3, "name": "Минёр", "effect": "Мины 3/день (3d6, S=6).", "type": "active"},
+            {"level": 6, "name": "Быстрая установка", "effect": "Мины — бонусным действием.", "type": "passive"},
+            {"level": 9, "name": "Цепная реакция", "effect": "Все мины разом.", "type": "active"}
+          ]}
+      ]
+    },
+    {
+      "id": "code_weaver",
+      "name": "Кодер",
+      "name_en": "Code Weaver",
+      "role": "Саппорт, хакер реальности, контроллер",
+      "description": "Кодер видит мир как операционную систему. Там, где другие видят реальность, Кодер видит код — и он знает его баги. Он не выходит на передовую с оружием. Вместо этого он усиливает союзников, ослабляет врагов и взламывает саму ткань реальности.",
+      "key_skills": ["INT", "NET", "KNW"],
+      "hp_start_bonus": 0,
+      "hp_per_level": 2,
+      "starting_skills": {"BS": 2, "WS": 1, "STR": 1, "T": 2, "AG": 3, "INT": 6, "PER": 3, "INF": 1, "TECH": 2, "NET": 5, "KNW": 4, "SURV": 1},
+      "abilities": [
+        {"level": 1, "name": "ВМ", "type": "resource", "description": "Вычислительная Мощность = уровень + INT. Восстановление: короткий отдых."},
+        {"level": 1, "name": "Инъекции кода", "type": "active", "description": "Баффы (+S, +СУ, лечение, регенерация), дебаффы (-ТБ, помехи, урон). Требуют проверки NET."},
+        {"level": 1, "name": "Системные Команды", "type": "active", "description": "Бесплатные кантипы: static --burst, echo, grep signal, touch --static, alias."},
+        {"level": 1, "name": "Шкала Нагрузки", "type": "passive", "description": "Терминал греется. При 20 — отключается, 1d6 урона, Глитчи знают координаты."},
+        {"level": 2, "name": "Чтение Глюков", "type": "active", "description": "Анализ Глитча (NET)."},
+        {"level": 3, "name": "Саппорт-протокол", "type": "active", "uses": "3 раза в день", "description": "Преимущество на пробитие союзнику."},
+        {"level": 5, "name": "Оптимизация", "type": "passive", "description": "-1 ВМ на Инъекцию (1/отдых)."},
+        {"level": 9, "name": "Зеркальный код", "type": "reaction", "description": "Отражение урона (3 ВМ)."},
+        {"level": 10, "name": "Рут-доступ", "type": "active", "uses": "1 раз в день", "description": "Автоуспех Инъекции."}
+      ],
+      "specializations": [
+        {"id": "signature_coder", "name": "Сигнатурщик", "description": "Специалист по взлому и урону через код.",
+          "abilities": [
+            {"level": 3, "name": "Усиленный взлом", "effect": "Перегрузка +1d6 урона.", "type": "passive"},
+            {"level": 6, "name": "Взлом техники", "effect": "Преимущество на NET vs техники.", "type": "passive"},
+            {"level": 9, "name": "Двойной удар", "effect": "Двойной урон/длительность (1/день).", "type": "active"}
+          ]},
+        {"id": "architect", "name": "Архитектор", "description": "Мастер системного взлома и контроля над техникой.",
+          "abilities": [
+            {"level": 3, "name": "Инженерный подход", "effect": "INT вместо TECH для ремонта.", "type": "passive"},
+            {"level": 6, "name": "Глубокий взлом", "effect": "Взлом меха (NET vs ТБ+10).", "type": "active"},
+            {"level": 9, "name": "Полный контроль", "effect": "Контроль над мехом (1/день).", "type": "active"}
+          ]}
+      ]
+    },
+    {
+      "id": "combat_medic",
+      "name": "Медик",
+      "name_en": "Combat Medic",
+      "role": "Полевой врач, защитник, поддержка",
+      "description": "Медик — это не просто врач. Это ангел-хранитель отряда. Он возвращает бойцов с того света, лечит раны, усиливает союзников и не даёт никому умереть.",
+      "key_skills": ["INT", "PER", "TECH"],
+      "hp_start_bonus": 2,
+      "hp_per_level": 2,
+      "starting_skills": {"BS": 3, "WS": 2, "STR": 2, "T": 4, "AG": 3, "INT": 5, "PER": 5, "INF": 3, "TECH": 4, "NET": 1, "KNW": 2, "SURV": 3},
+      "abilities": [
+        {"level": 1, "name": "Медицинские процедуры", "type": "active", "description": "Инъекция (1d8+2, 3/день), Перевязка (2d8+2), Операция (полное восстановление)."},
+        {"level": 1, "name": "Полевой ремонт", "type": "passive", "description": "INT вместо TECH для техники."},
+        {"level": 1, "name": "Стимулятор пилота", "type": "active", "uses": "3 раза в день", "description": "Преимущество на BS пилоту."},
+        {"level": 2, "name": "Обезболивающее", "type": "active", "uses": "3 раза в день", "description": "+1 СУ союзнику."},
+        {"level": 3, "name": "Триаж", "type": "active", "description": "Оценка всех союзников (хиты, состояния)."},
+        {"level": 5, "name": "Адреналин", "type": "active", "uses": "2 раза в день", "description": "Игнор «Ранен» на 3 раунда."},
+        {"level": 7, "name": "Эвакуация", "type": "active", "uses": "1 раз в бой", "description": "Вынос раненого без провокаций."},
+        {"level": 9, "name": "Массовая инъекция", "type": "active", "uses": "1 раз в день", "description": "3 цели одновременно."},
+        {"level": 10, "name": "Чудо медицины", "type": "active", "uses": "1 раз в неделю", "description": "Воскрешение."}
+      ],
+      "specializations": [
+        {"id": "veterinarian", "name": "Ветеринар", "description": "Специалист по нечеловеческой физиологии.",
+          "abilities": [
+            {"level": 3, "name": "Адаптивное лечение", "effect": "Лечение Глитчей/мутантов без штрафов.", "type": "passive"},
+            {"level": 6, "name": "Усиление мутанта", "effect": "Лечение → +1 S Глитчу.", "type": "passive"},
+            {"level": 9, "name": "Дистанционное лечение", "effect": "Лечение на любом расстоянии.", "type": "active"}
+          ]},
+        {"id": "surgeon", "name": "Хирург", "description": "Мастер операций и имплантации.",
+          "abilities": [
+            {"level": 3, "name": "Быстрая операция", "effect": "Операция за 1 действие (1/день).", "type": "active"},
+            {"level": 6, "name": "Полевая имплантация", "effect": "Имплантаты в полевых условиях.", "type": "passive"},
+            {"level": 9, "name": "Мастер-хирург", "effect": "Все процедуры +1 кость.", "type": "passive"}
+          ]}
+      ]
+    },
+    {
+      "id": "operator",
+      "name": "Оператор",
+      "name_en": "The Operator",
+      "role": "Пилот меха, тактик, универсал",
+      "description": "Оператор — это душа меха. Он чувствует свою машину, как собственное тело, и управляет ею с точностью, недоступной обычным людям. В бою он — командный центр, тактик и самая мощная огневая единица отряда.",
+      "key_skills": ["BS", "INT", "TECH"],
+      "hp_start_bonus": 4,
+      "hp_per_level": 4,
+      "starting_skills": {"BS": 5, "WS": 2, "STR": 3, "T": 4, "AG": 4, "INT": 4, "PER": 3, "INF": 2, "TECH": 4, "NET": 1, "KNW": 1, "SURV": 2},
+      "abilities": [
+        {"level": 1, "name": "Связь с машиной", "type": "passive", "description": "Уровни: Незнакомец → Напарник (3 боя, +1 BS) → Друг (6, +1 иниц.) → Сродство (10, бонус спец.)."},
+        {"level": 1, "name": "Последний штрих", "type": "active", "description": "+1 BS / +1 пробитие / +1 сброс тепла перед боем."},
+        {"level": 1, "name": "Шкала Освоения", "type": "passive", "description": "Манёвры по раундам: Быстрый старт, Контр-манёвр, Форсаж, Танец."},
+        {"level": 3, "name": "Тактический обзор", "type": "active", "uses": "2 раза в день", "description": "+2 PER союзникам."},
+        {"level": 5, "name": "Координация огня", "type": "active", "uses": "3 раза в день", "description": "Преимущество на атаку союзнику."},
+        {"level": 7, "name": "Эвакуация на мехе", "type": "passive", "description": "+1 пассажир."},
+        {"level": 9, "name": "Мастер пилотирования", "type": "passive", "description": "Преимущество на BS в мехе."},
+        {"level": 10, "name": "Танец Гиганта", "type": "active", "uses": "1 раз в день", "description": "+2 м, выход без провокаций, сброс тепла."}
+      ],
+      "specializations": [
+        {"id": "gunner", "name": "Стрелок", "description": "Мастер пулемётов и автопушек.",
+          "abilities": [
+            {"level": 3, "name": "Тяжёлый калибр", "effect": "Преимущество на BS (пулемёты).", "type": "passive"},
+            {"level": 6, "name": "Стабильная стрельба", "effect": "Нет помехи за очередь.", "type": "passive"},
+            {"level": 9, "name": "Убойная очередь", "effect": "+1 пробитие очередью.", "type": "passive"}
+          ]},
+        {"id": "sniper", "name": "Снайпер", "description": "Мастер точных выстрелов.",
+          "abilities": [
+            {"level": 3, "name": "Точный выстрел", "effect": "Преимущество на BS (ПТ/лазеры).", "type": "passive"},
+            {"level": 6, "name": "Смертельный прицел", "effect": "+1d6 урона при прицеливании.", "type": "passive"},
+            {"level": 9, "name": "Критический удар", "effect": "Крит на 3+ больше нужного.", "type": "passive"}
+          ]},
+        {"id": "engineer", "name": "Инженер", "description": "Мастер ремонта.",
+          "abilities": [
+            {"level": 3, "name": "Знание меха", "effect": "Преимущество на TECH (свой мех).", "type": "passive"},
+            {"level": 6, "name": "Быстрый ремонт", "effect": "Ремонт — бонусное действие.", "type": "passive"},
+            {"level": 9, "name": "Укрепление корпуса", "effect": "+15 ХП меху.", "type": "passive"}
+          ]}
+      ]
+    },
+    {
+      "id": "flesh_smith",
+      "name": "Кузнец Плоти",
+      "name_en": "Flesh Smith",
+      "role": "Адаптивный танк, живое оружие",
+      "description": "Кузнец Плоти — это симбиоз человека и металла, достигший совершенства. Его тело — оружие, его кожа — броня, его воля — реактор. Он не носит доспехи, потому что сам является доспехом.",
+      "key_skills": ["WS", "STR", "T", "SURV"],
+      "hp_start_bonus": 6,
+      "hp_per_level": 4,
+      "requirement": "Только для Сплавленных",
+      "starting_skills": {"BS": 2, "WS": 5, "STR": 5, "T": 5, "AG": 3, "INT": 2, "PER": 3, "INF": 1, "TECH": 1, "NET": 1, "KNW": 1, "SURV": 4},
+      "abilities": [
+        {"level": 1, "name": "Живое Оружие", "type": "passive", "description": "S = STR. Урон: 1d6 (1 ур.) → 1d8 (5 ур.) → 1d10 (9 ур.)."},
+        {"level": 1, "name": "Адаптивная физиология", "type": "passive", "description": "Сопротивление последнему типу урона."},
+        {"level": 1, "name": "Биомасса", "type": "resource", "description": "3 + уровень. Восстановление: короткий отдых."},
+        {"level": 2, "name": "Адаптации", "type": "active", "description": "Клинок (+1 кость), Щит (+2 СУ), Шипы (1d4 ответ), Регенерация (+2 ХП/ход), Плевок (1d8, S=3)."},
+        {"level": 5, "name": "Двойная атака", "type": "passive", "description": "Две атаки в ближнем бою."},
+        {"level": 9, "name": "Совершенное Слияние", "type": "passive", "description": "Иммунитет к ядам. Авто-1 ХП при 0 (1/день)."},
+        {"level": 10, "name": "Апекс-Хищник", "type": "active", "uses": "1 раз в день", "description": "Игнор СУ, +2 S, регенерация 5 ХП/ход (3 раунда)."}
+      ],
+      "specializations": [
+        {"id": "predator", "name": "Хищник", "description": "Неудержимый охотник.",
+          "abilities": [
+            {"level": 3, "name": "Био-Заряд", "effect": "Рывок 15 м + урон.", "type": "active"},
+            {"level": 6, "name": "Живая Сеть", "effect": "Захват цели.", "type": "active"},
+            {"level": 9, "name": "Против техники", "effect": "+1 S против техники.", "type": "passive"}
+          ]},
+        {"id": "bulwark", "name": "Оплот", "description": "Живая стена.",
+          "abilities": [
+            {"level": 3, "name": "Живая Стена", "effect": "+3 СУ, союзники — сопротивление.", "type": "active"},
+            {"level": 6, "name": "Поглощение Удара", "effect": "Пол-урона за союзника.", "type": "reaction"},
+            {"level": 9, "name": "Несдвигаемый", "effect": "Иммунитет к отбрасыванию.", "type": "passive"}
+          ]}
+      ]
+    },
+    {
+      "id": "glitch_weaver",
+      "name": "Вирусолог",
+      "name_en": "Glitch Weaver",
+      "role": "Призыватель Глитчей, ослабитель, контроллер",
+      "description": "Вирусолог смотрит на Глитчей и видит не врагов, а инструменты. Там, где другие бегут от порождений Ошибки, Вирусолог протягивает им руку — и они слушаются. Его союзники — баги реальности, его оружие — сам хаос.",
+      "key_skills": ["INT", "NET", "PER"],
+      "hp_start_bonus": 0,
+      "hp_per_level": 2,
+      "starting_skills": {"BS": 2, "WS": 1, "STR": 1, "T": 3, "AG": 3, "INT": 5, "PER": 5, "INF": 2, "TECH": 2, "NET": 5, "KNW": 3, "SURV": 2},
+      "abilities": [
+        {"level": 1, "name": "Заряды Глитчей (ЗГ)", "type": "resource", "description": "Уровень + INT. Восстановление: короткий отдых."},
+        {"level": 1, "name": "Призыв Мерцающего", "type": "active", "cost": "1 ЗГ", "description": "ХП 5+ур., S=2, -1 ТБ при попадании."},
+        {"level": 1, "name": "Заразить врага", "type": "active", "cost": "2 ЗГ", "description": "Контроль техники (NET vs ТБ+8)."},
+        {"level": 2, "name": "Усиление союзника", "type": "active", "cost": "2 ЗГ", "description": "Случайная мутация (d4): скорость, когти, кожа, эхо-локация."},
+        {"level": 3, "name": "Контроль мутаций", "type": "active", "cost": "3 ЗГ", "description": "Выбор эффекта вместо случайного."},
+        {"level": 5, "name": "Двойной призыв", "type": "active", "cost": "2 ЗГ", "description": "2 Мерцающих за 2 ЗГ."},
+        {"level": 6, "name": "Призыв Блокировщика", "type": "active", "cost": "3 ЗГ", "description": "ХП 15+ур., S=3, -2 ТБ."},
+        {"level": 9, "name": "Призыв Пакетного Шторма", "type": "active", "cost": "5 ЗГ", "description": "ХП 30, S=3, -1 ТБ в области."},
+        {"level": 10, "name": "Владыка Сбоя", "type": "active", "uses": "1 раз в день", "description": "Демон Сбоя (ХП 50, S=5, 3d8, 3 раунда)."}
+      ],
+      "specializations": [
+        {"id": "signature_weaver", "name": "Сигнатурщик", "description": "Мастер призыва Глитчей.",
+          "abilities": [
+            {"level": 3, "name": "Варианты Мерцающих", "effect": "Искра/Тень/Рой.", "type": "passive"},
+            {"level": 6, "name": "Экономия", "effect": "Блокировщик за 2 ЗГ.", "type": "passive"},
+            {"level": 9, "name": "Экономия шторма", "effect": "Пакетный Шторм за 4 ЗГ.", "type": "passive"}
+          ]},
+        {"id": "carrier", "name": "Носитель", "description": "Специалист по мутациям.",
+          "abilities": [
+            {"level": 3, "name": "Усиленные мутации", "effect": "Мутации +1 к эффекту.", "type": "passive"},
+            {"level": 6, "name": "Вирусный Скачок", "effect": "Заражает атакующих врагов.", "type": "passive"},
+            {"level": 9, "name": "Слияние", "effect": "Полёт, сопротивление, атака.", "type": "active"}
+          ]}
+      ]
+    }
+  ]
+}

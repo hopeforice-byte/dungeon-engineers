@@ -1,0 +1,631 @@
+{
+  "implants": {
+    "slots": {
+      "Голова": {"max": 2, "description": "Нейро-имплантаты, чипы, процессоры"},
+      "Глаза": {"max": 2, "description": "Оптические имплантаты, сенсоры, HUD"},
+      "Рука правая": {"max": 1, "description": "Манипуляторы, оружие, протезы"},
+      "Рука левая": {"max": 1, "description": "Манипуляторы, оружие, протезы"},
+      "Нога правая": {"max": 1, "description": "Сервоприводы, амортизаторы"},
+      "Нога левая": {"max": 1, "description": "Сервоприводы, амортизаторы"},
+      "Торс": {"max": 2, "description": "Органы, броня, фильтры"},
+      "Экзотика": {"max": 1, "description": "Хвосты, крылья, антенны"}
+    },
+    "alienation_stages": [
+      {"max": 15, "stage": "Человек", "effect": "Нет эффекта"},
+      {"max": 30, "stage": "Модификант", "effect": "Помеха на INF с «чистыми» людьми"},
+      {"max": 50, "stage": "Киборг", "effect": "Обычная еда не насыщает. Лечение органикой — 50%."},
+      {"max": 70, "stage": "Машина", "effect": "Помеха на PER (эмпатия). Преимущество на спас-броски от страха."},
+      {"max": 90, "stage": "Грань", "effect": "Нет снов. Дети и животные боятся. Преимущество на концентрацию."},
+      {"max": 100, "stage": "Голем (NPC)", "effect": "Персонаж становится NPC."}
+    ],
+    "items": [
+      {
+        "id": "imp_head_cache",
+        "name": "Чип памяти «Кеш»",
+        "slot": "Голова",
+        "effect": "+1 KNW при воспоминании фактов, чертежей, кодов",
+        "effect_bonus": {"KNW": 1, "context": "воспоминания"},
+        "alienation": 3,
+        "price": 120,
+        "su_bonus": 0,
+        "rarity": "common"
+      },
+      {
+        "id": "imp_head_archive",
+        "name": "Чип памяти «Архив» (древний)",
+        "slot": "Голова",
+        "effect": "+2 KNW при воспоминании. Фотографическая память.",
+        "effect_bonus": {"KNW": 2, "context": "воспоминания"},
+        "alienation": 5,
+        "price": 900,
+        "su_bonus": 0,
+        "rarity": "rare"
+      },
+      {
+        "id": "imp_head_pain_blocker",
+        "name": "Нейро-подавитель боли",
+        "slot": "Голова",
+        "effect": "Преимущество на T при спас-бросках от боли",
+        "effect_bonus": {"T": "advantage", "context": "боль"},
+        "alienation": 5,
+        "price": 180,
+        "su_bonus": 0,
+        "rarity": "uncommon"
+      },
+      {
+        "id": "imp_head_barrier",
+        "name": "Нейро-подавитель «Барьер» (древний)",
+        "slot": "Голова",
+        "effect": "Иммунитет к боли, преимущество на спас-броски от ментальных атак",
+        "effect_bonus": {"immunity": "боль", "mental_saves": "advantage"},
+        "alienation": 8,
+        "price": 1200,
+        "su_bonus": 0,
+        "rarity": "rare"
+      },
+      {
+        "id": "imp_head_network_receiver",
+        "name": "Сетевой приёмник «Паутина»",
+        "slot": "Голова",
+        "effect": "+1 NET, подключение к сети без планшета",
+        "effect_bonus": {"NET": 1},
+        "alienation": 7,
+        "price": 200,
+        "su_bonus": 0,
+        "rarity": "uncommon"
+      },
+      {
+        "id": "imp_head_language_decoder",
+        "name": "Языковой декодер",
+        "slot": "Голова",
+        "effect": "Понимание всех известных языков (Общий, Машинный Код, древние). Говорить не обучает.",
+        "effect_bonus": {"languages": "all_comprehension"},
+        "alienation": 3,
+        "price": 150,
+        "su_bonus": 0,
+        "rarity": "common"
+      },
+      {
+        "id": "imp_head_combat_accelerator",
+        "name": "Боевой нейро-ускоритель",
+        "slot": "Голова",
+        "effect": "+1 к инициативе",
+        "effect_bonus": {"initiative": 1},
+        "alienation": 10,
+        "price": 400,
+        "su_bonus": 0,
+        "rarity": "uncommon"
+      },
+      {
+        "id": "imp_head_backup_consciousness",
+        "name": "Резервное сознание",
+        "slot": "Голова",
+        "effect": "1 раз в день — действовать ещё 1 раунд при падении до 0 ХП",
+        "effect_bonus": {"death_save": "extra_round"},
+        "alienation": 15,
+        "price": 800,
+        "su_bonus": 0,
+        "rarity": "rare"
+      },
+      {
+        "id": "imp_head_echo",
+        "name": "Имплантат «Эхо»",
+        "slot": "Голова",
+        "effect": "+1 PER, эхо-локация 10 м (чувствует объекты в темноте)",
+        "effect_bonus": {"PER": 1, "echolocation": "10m"},
+        "alienation": 8,
+        "price": 400,
+        "su_bonus": 0,
+        "rarity": "uncommon"
+      },
+      {
+        "id": "imp_head_neira7",
+        "name": "«Нейра-7» (древний)",
+        "slot": "Голова",
+        "effect": "+1 BS при стрельбе из меха, преимущество на инициативу",
+        "effect_bonus": {"BS": 1, "context": "в мехе", "initiative": "advantage"},
+        "alienation": 5,
+        "price": 3000,
+        "su_bonus": 0,
+        "rarity": "legendary"
+      },
+      {
+        "id": "imp_eye_night_vision",
+        "name": "Ночное зрение",
+        "slot": "Глаза",
+        "effect": "Видит в темноте на 20 метров",
+        "effect_bonus": {"dark_vision": 20},
+        "alienation": 3,
+        "price": 100,
+        "su_bonus": 0,
+        "rarity": "common"
+      },
+      {
+        "id": "imp_eye_thermal",
+        "name": "Тепловизор «Инфра»",
+        "slot": "Глаза",
+        "effect": "Видит тепловые следы существ (включая невидимых без тепловой маскировки). Радиус 15 м.",
+        "effect_bonus": {"thermal_vision": 15},
+        "alienation": 5,
+        "price": 180,
+        "su_bonus": 0,
+        "rarity": "uncommon"
+      },
+      {
+        "id": "imp_eye_zoom",
+        "name": "Зум-линза «Орёл»",
+        "slot": "Глаза",
+        "effect": "+1 PER на дистанции 30+ метров",
+        "effect_bonus": {"PER": 1, "context": "дальняя дистанция"},
+        "alienation": 3,
+        "price": 120,
+        "su_bonus": 0,
+        "rarity": "common"
+      },
+      {
+        "id": "imp_eye_signal_detector",
+        "name": "Детектор сигналов «Эхо»",
+        "slot": "Глаза",
+        "effect": "Видит активные радиоволны, беспроводные сети и излучение устройств. +1 PER для поиска техники.",
+        "effect_bonus": {"PER": 1, "context": "поиск техники"},
+        "alienation": 7,
+        "price": 200,
+        "su_bonus": 0,
+        "rarity": "uncommon"
+      },
+      {
+        "id": "imp_eye_hud_tactical",
+        "name": "Боевой HUD «Тактик»",
+        "slot": "Глаза",
+        "effect": "+1 BS при стрельбе дальнего боя",
+        "effect_bonus": {"BS": 1},
+        "alienation": 10,
+        "price": 450,
+        "su_bonus": 0,
+        "rarity": "uncommon"
+      },
+      {
+        "id": "imp_eye_hud_arc",
+        "name": "Боевой HUD «Арк» (древний)",
+        "slot": "Глаза",
+        "effect": "+2 BS при стрельбе дальнего боя. Встроенный дальномер.",
+        "effect_bonus": {"BS": 2},
+        "alienation": 10,
+        "price": 1800,
+        "su_bonus": 0,
+        "rarity": "rare"
+      },
+      {
+        "id": "imp_eye_recorder",
+        "name": "Модуль записи",
+        "slot": "Глаза",
+        "effect": "Запись видео и аудио. Проекция голограмм.",
+        "effect_bonus": {"recording": true, "hologram_projection": true},
+        "alienation": 5,
+        "price": 130,
+        "su_bonus": 0,
+        "rarity": "common"
+      },
+      {
+        "id": "imp_eye_scanner",
+        "name": "Глаз-сканер «Спектр»",
+        "slot": "Глаза",
+        "effect": "Видит уязвимости техники. После прицеливания 1 раунд — +1d4 урона технике.",
+        "effect_bonus": {"tech_damage_bonus": "1d4"},
+        "alienation": 7,
+        "price": 350,
+        "su_bonus": 0,
+        "rarity": "uncommon"
+      },
+      {
+        "id": "imp_eye_spectrum_sensor",
+        "name": "Оптический сенсор «Спектр» (древний)",
+        "slot": "Глаза",
+        "effect": "Ночное зрение 30 м + тепловизор + зум ×10. Занимает оба слота глаз.",
+        "effect_bonus": {"dark_vision": 30, "thermal_vision": 15, "zoom": 10},
+        "alienation": 8,
+        "price": 1500,
+        "su_bonus": 0,
+        "rarity": "rare",
+        "note": "Занимает оба слота Глаз"
+      },
+      {
+        "id": "imp_arm_hidden_compartment",
+        "name": "Скрытый отсек",
+        "slot": "Рука",
+        "effect": "Тайник для мелкого предмета (флешка, ключ, граната). Не обнаруживается при обыске.",
+        "effect_bonus": {"hidden_compartment": true},
+        "alienation": 3,
+        "price": 70,
+        "su_bonus": 0,
+        "rarity": "common"
+      },
+      {
+        "id": "imp_arm_multitool",
+        "name": "Встроенный мультитул",
+        "slot": "Рука",
+        "effect": "+1 TECH. Всегда под рукой набор отвёрток, паяльник, нож.",
+        "effect_bonus": {"TECH": 1},
+        "alienation": 3,
+        "price": 100,
+        "su_bonus": 0,
+        "rarity": "common"
+      },
+      {
+        "id": "imp_arm_shocker",
+        "name": "Скрытый шокер «Искра»",
+        "slot": "Рука",
+        "effect": "Атака ближнего боя: 1d6 электрический + оглушение (спас T Сл 12)",
+        "effect_bonus": {"weapon": {"damage": "1d6", "type": "электрический", "special": "оглушение"}},
+        "alienation": 5,
+        "price": 220,
+        "su_bonus": 0,
+        "rarity": "uncommon"
+      },
+      {
+        "id": "imp_arm_pistol",
+        "name": "Скрытый пистолет «Жало»",
+        "slot": "Рука",
+        "effect": "Дальняя атака: 1d8 кинетический, 15/45 м, магазин 3 патрона",
+        "effect_bonus": {"weapon": {"damage": "1d8", "type": "кинетический", "range": "15/45 м", "ammo": 3}},
+        "alienation": 10,
+        "price": 400,
+        "su_bonus": 0,
+        "rarity": "uncommon"
+      },
+      {
+        "id": "imp_arm_magnetic_grip",
+        "name": "Магнитный захват",
+        "slot": "Рука",
+        "effect": "Притянуть небольшой металлический предмет (до 5 кг) на расстоянии 3 метров",
+        "effect_bonus": {"magnetic_grip": "5kg/3m"},
+        "alienation": 5,
+        "price": 180,
+        "su_bonus": 0,
+        "rarity": "uncommon"
+      },
+      {
+        "id": "imp_arm_cyber_prosthesis",
+        "name": "Кибер-рука (протез)",
+        "slot": "Рука",
+        "effect": "+1 STR для этой руки",
+        "effect_bonus": {"STR": 1, "context": "эта рука"},
+        "alienation": 7,
+        "price": 350,
+        "su_bonus": 0,
+        "rarity": "common"
+      },
+      {
+        "id": "imp_arm_claw_prosthesis",
+        "name": "Боевой протез «Коготь» (древний)",
+        "slot": "Рука",
+        "effect": "Встроенный виброклинок: 1d8 режущий, игнорирует 3 СУ",
+        "effect_bonus": {"weapon": {"damage": "1d8", "type": "режущий", "ignore_SU": 3}},
+        "alienation": 8,
+        "price": 1800,
+        "su_bonus": 0,
+        "rarity": "rare"
+      },
+      {
+        "id": "imp_arm_titan",
+        "name": "Кибер-рука «Титан» (древняя)",
+        "slot": "Рука",
+        "effect": "+2 STR для этой руки, встроенный шокер (1d8 электрический)",
+        "effect_bonus": {"STR": 2, "context": "эта рука", "weapon": {"damage": "1d8", "type": "электрический"}},
+        "alienation": 10,
+        "price": 2000,
+        "su_bonus": 0,
+        "rarity": "rare"
+      },
+      {
+        "id": "imp_leg_shock_absorbers",
+        "name": "Амортизаторы",
+        "slot": "Нога",
+        "effect": "Падение с высоты до 10 метров без урона",
+        "effect_bonus": {"fall_damage_immune": 10},
+        "alienation": 3,
+        "price": 90,
+        "su_bonus": 0,
+        "rarity": "common"
+      },
+      {
+        "id": "imp_leg_accelerators",
+        "name": "Ускорители",
+        "slot": "Нога",
+        "effect": "+1,5 метра к скорости",
+        "effect_bonus": {"speed": 1.5},
+        "alienation": 5,
+        "price": 220,
+        "su_bonus": 0,
+        "rarity": "common"
+      },
+      {
+        "id": "imp_leg_jump_servos",
+        "name": "Прыжковые сервоприводы",
+        "slot": "Нога",
+        "effect": "Прыжок 5 м вверх × 10 м в длину. 3 раза в день.",
+        "effect_bonus": {"jump": "5×10 м", "uses": 3},
+        "alienation": 7,
+        "price": 350,
+        "su_bonus": 0,
+        "rarity": "uncommon"
+      },
+      {
+        "id": "imp_leg_magnetic_feet",
+        "name": "Магнитные стопы",
+        "slot": "Нога",
+        "effect": "Ходьба по металлическим вертикальным стенам и потолку (половина скорости)",
+        "effect_bonus": {"magnetic_walking": true},
+        "alienation": 5,
+        "price": 250,
+        "su_bonus": 0,
+        "rarity": "uncommon"
+      },
+      {
+        "id": "imp_leg_hidden_blade",
+        "name": "Скрытый клинок в пятке",
+        "slot": "Нога",
+        "effect": "Атака: 1d4 режущий. Всегда вооружён.",
+        "effect_bonus": {"weapon": {"damage": "1d4", "type": "режущий"}},
+        "alienation": 3,
+        "price": 100,
+        "su_bonus": 0,
+        "rarity": "common"
+      },
+      {
+        "id": "imp_leg_rhino_drives",
+        "name": "Усиленные приводы «Носорог»",
+        "slot": "Нога",
+        "effect": "+3 метра к скорости. Помеха на AG (скрытность).",
+        "effect_bonus": {"speed": 3},
+        "alienation": 5,
+        "price": 450,
+        "su_bonus": 0,
+        "rarity": "uncommon"
+      },
+      {
+        "id": "imp_leg_speed_drives",
+        "name": "Приводы «Скорость» (древние)",
+        "slot": "Нога",
+        "effect": "+3 метра к скорости. Преимущество на AG (акробатика).",
+        "effect_bonus": {"speed": 3, "AG": "advantage", "context": "акробатика"},
+        "alienation": 7,
+        "price": 1500,
+        "su_bonus": 0,
+        "rarity": "rare"
+      },
+      {
+        "id": "imp_leg_grasshopper",
+        "name": "Прыжковые сервоприводы «Кузнечик» (древние)",
+        "slot": "Нога",
+        "effect": "Прыжок 10 м вверх × 20 м в длину. 3 раза в день.",
+        "effect_bonus": {"jump": "10×20 м", "uses": 3},
+        "alienation": 8,
+        "price": 1800,
+        "su_bonus": 0,
+        "rarity": "rare"
+      },
+      {
+        "id": "imp_torso_subdermal_armor",
+        "name": "Подкожная броня",
+        "slot": "Торс",
+        "effect": "+1 СУ",
+        "effect_bonus": {"SU": 1},
+        "alienation": 5,
+        "price": 350,
+        "su_bonus": 1,
+        "rarity": "uncommon"
+      },
+      {
+        "id": "imp_torso_fortress_armor",
+        "name": "Подкожная броня «Крепость» (древняя)",
+        "slot": "Торс",
+        "effect": "+2 СУ",
+        "effect_bonus": {"SU": 2},
+        "alienation": 8,
+        "price": 1500,
+        "su_bonus": 2,
+        "rarity": "rare"
+      },
+      {
+        "id": "imp_torso_second_heart",
+        "name": "Второе сердце",
+        "slot": "Торс",
+        "effect": "+1 к спас-броскам от смерти",
+        "effect_bonus": {"death_saves": 1},
+        "alienation": 10,
+        "price": 700,
+        "su_bonus": 0,
+        "rarity": "uncommon"
+      },
+      {
+        "id": "imp_torso_rhythm_heart",
+        "name": "Второе сердце «Ритм» (древнее)",
+        "slot": "Торс",
+        "effect": "+2 к спас-броскам от смерти, автостабилизация при 0 ХП",
+        "effect_bonus": {"death_saves": 2, "auto_stabilize": true},
+        "alienation": 12,
+        "price": 2200,
+        "su_bonus": 0,
+        "rarity": "rare"
+      },
+      {
+        "id": "imp_torso_blood_filter",
+        "name": "Фильтр крови",
+        "slot": "Торс",
+        "effect": "Иммунитет к ядам и токсинам",
+        "effect_bonus": {"immunity": ["яды", "токсины"]},
+        "alienation": 7,
+        "price": 450,
+        "su_bonus": 0,
+        "rarity": "uncommon"
+      },
+      {
+        "id": "imp_torso_oxygen_reserve",
+        "name": "Кислородный накопитель",
+        "slot": "Торс",
+        "effect": "Задержка дыхания до 10 минут",
+        "effect_bonus": {"breath_holding": "10 минут"},
+        "alienation": 3,
+        "price": 150,
+        "su_bonus": 0,
+        "rarity": "common"
+      },
+      {
+        "id": "imp_torso_energy_core",
+        "name": "Энерго-ядро",
+        "slot": "Торс",
+        "effect": "Не нуждается в еде. Требует 1 Вт энергии в день.",
+        "effect_bonus": {"no_food": true, "energy_cost": "1 Вт/день"},
+        "alienation": 15,
+        "price": 700,
+        "su_bonus": 0,
+        "rarity": "rare"
+      },
+      {
+        "id": "imp_torso_tissue_regenerator",
+        "name": "Регенератор тканей",
+        "slot": "Торс",
+        "effect": "+1 ХП в час",
+        "effect_bonus": {"hp_regen": "1/час"},
+        "alienation": 10,
+        "price": 550,
+        "su_bonus": 0,
+        "rarity": "uncommon"
+      },
+      {
+        "id": "imp_torso_healing_regenerator",
+        "name": "Регенератор «Исцеление» (древний)",
+        "slot": "Торс",
+        "effect": "+3 ХП в час, +1 ХП каждые 10 минут в бою",
+        "effect_bonus": {"hp_regen": "3/час", "combat_regen": "1/10мин"},
+        "alienation": 12,
+        "price": 2500,
+        "su_bonus": 0,
+        "rarity": "rare"
+      },
+      {
+        "id": "imp_torso_hidden_charge",
+        "name": "Скрытый заряд",
+        "slot": "Торс",
+        "effect": "Самоподрыв при смерти: 3d6 осколочного урона в радиусе 5 м",
+        "effect_bonus": {"death_explosion": "3d6/5м"},
+        "alienation": 15,
+        "price": 500,
+        "su_bonus": 0,
+        "rarity": "uncommon"
+      },
+      {
+        "id": "imp_torso_second_skin",
+        "name": "«Вторая Кожа» (легендарный)",
+        "slot": "Торс",
+        "effect": "+1 СУ. Не занимает слот брони. Невидим под одеждой.",
+        "effect_bonus": {"SU": 1, "invisible": true},
+        "alienation": 5,
+        "price": 5000,
+        "su_bonus": 1,
+        "rarity": "legendary"
+      },
+      {
+        "id": "imp_exo_tail_manipulator",
+        "name": "Хвост-манипулятор",
+        "slot": "Экзотика",
+        "effect": "Дополнительная конечность. +1 AG (акробатика). Может держать предмет.",
+        "effect_bonus": {"AG": 1, "context": "акробатика", "extra_limb": true},
+        "alienation": 10,
+        "price": 450,
+        "su_bonus": 0,
+        "rarity": "uncommon"
+      },
+      {
+        "id": "imp_exo_flex_tail",
+        "name": "Хвост-манипулятор «Гибкий» (древний)",
+        "slot": "Экзотика",
+        "effect": "+2 AG (акробатика). Может держать оружие и атаковать им.",
+        "effect_bonus": {"AG": 2, "context": "акробатика", "weapon_limb": true},
+        "alienation": 12,
+        "price": 1500,
+        "su_bonus": 0,
+        "rarity": "rare"
+      },
+      {
+        "id": "imp_exo_biowings",
+        "name": "Био-крылья (Симбиоты)",
+        "slot": "Экзотика",
+        "effect": "Планирование: урон от падения снижен на 50%",
+        "effect_bonus": {"gliding": true},
+        "alienation": 15,
+        "price": "Дар",
+        "su_bonus": 0,
+        "rarity": "rare"
+      },
+      {
+        "id": "imp_exo_antenna_crest",
+        "name": "Гребень-антенна «Эфир»",
+        "slot": "Экзотика",
+        "effect": "+2 NET. Пассивное сканирование эфира.",
+        "effect_bonus": {"NET": 2},
+        "alienation": 7,
+        "price": 300,
+        "su_bonus": 0,
+        "rarity": "uncommon"
+      },
+      {
+        "id": "imp_exo_bone_spikes",
+        "name": "Костяные шипы (Симбиоты)",
+        "slot": "Экзотика",
+        "effect": "1d4 ответного урона атакующим в ближнем бою",
+        "effect_bonus": {"retaliation_damage": "1d4"},
+        "alienation": 5,
+        "price": "Дар",
+        "su_bonus": 0,
+        "rarity": "rare"
+      },
+      {
+        "id": "imp_exo_chameleon_skin",
+        "name": "Хамелеон-кожа",
+        "slot": "Экзотика",
+        "effect": "Преимущество на AG (скрытность)",
+        "effect_bonus": {"AG": "advantage", "context": "скрытность"},
+        "alienation": 8,
+        "price": 500,
+        "su_bonus": 0,
+        "rarity": "uncommon"
+      },
+      {
+        "id": "imp_exo_chameleon_plus",
+        "name": "Хамелеон-кожа «Невидимка» (древняя)",
+        "slot": "Экзотика",
+        "effect": "Преимущество на AG (скрытность), +2 AG (скрытность)",
+        "effect_bonus": {"AG": 2, "context": "скрытность", "advantage": true},
+        "alienation": 10,
+        "price": 2000,
+        "su_bonus": 0,
+        "rarity": "rare"
+      }
+    ],
+    "summary": {
+      "total": 46,
+      "by_slot": {
+        "Голова": 10,
+        "Глаза": 9,
+        "Рука": 8,
+        "Нога": 8,
+        "Торс": 10,
+        "Экзотика": 8
+      },
+      "by_rarity": {
+        "common": 12,
+        "uncommon": 17,
+        "rare": 14,
+        "legendary": 3
+      },
+      "notes": [
+        "Големы и ИскИны не получают Отчуждения",
+        "Сплавленные получают половину Отчуждения (округление вверх)",
+        "Оптический сенсор «Спектр» (древний) занимает оба слота Глаз",
+        "Имплантаты с ценой «Дар» не покупаются — только через сюжет"
+      ]
+    }
+  }
+}

@@ -1,0 +1,103 @@
+{
+  "consumables": {
+    "medical": [
+      {"id": "medkit", "name": "Аптечка первой помощи", "uses": 3, "effect": "+1d4+2 ХП за использование", "price": 20},
+      {"id": "advanced_medkit", "name": "Продвинутая аптечка", "uses": 5, "effect": "+2d4+2 ХП за использование", "price": 60},
+      {"id": "surgery_kit", "name": "Полевой хирургический набор", "uses": 5, "effect": "Для операций", "price": 100},
+      {"id": "adrenaline", "name": "Инъектор «Адреналин»", "uses": 1, "effect": "+2 м скорости, преимущество на INF (страх) на 1 мин, затем 1 истощение", "price": 25},
+      {"id": "clarity", "name": "Стимулятор «Ясность»", "uses": 1, "effect": "Снимает Очарован/Испуган, +1 PER на 10 мин", "price": 30},
+      {"id": "antidote", "name": "Антидот", "uses": 1, "effect": "Снимает Отравлен", "price": 40},
+      {"id": "painkiller", "name": "Обезболивающее (шприц)", "uses": 1, "effect": "+1 СУ на 2 раунда", "price": 30},
+      {"id": "regeneration_serum", "name": "Сыворотка «Регенерация» (редкая)", "uses": 1, "effect": "+3d8 ХП, только органика", "price": 300},
+      {"id": "coagulant", "name": "Коагулянт", "uses": 1, "effect": "Останавливает кровотечение мгновенно", "price": 20},
+      {"id": "radioprotector", "name": "Радиопротектор", "uses": 1, "effect": "Сопротивление радиации на 1 час", "price": 50},
+      {"id": "green_medkit", "name": "«Зелёная аптечка» (древняя)", "uses": 1, "effect": "+2d8 ХП органике", "price": 500},
+      {"id": "purifying_gel", "name": "Очищающий гель (древний)", "uses": 1, "effect": "Снимает радиационное заражение", "price": 350}
+    ],
+    "technical": [
+      {"id": "battery_tab", "name": "Батарейка-таблетка", "effect": "1 Вт энергии", "price": 2},
+      {"id": "energy_battery", "name": "Энерго-батарея", "effect": "10 Вт энергии", "price": 15},
+      {"id": "repair_kit", "name": "Ремонтный набор", "uses": 3, "effect": "+1d8+2 ХП технике за использование", "price": 35},
+      {"id": "advanced_repair_kit", "name": "Продвинутый ремонтный набор", "uses": 5, "effect": "+1d8+4 ХП технике за использование", "price": 80},
+      {"id": "emergency_repair_kit", "name": "Экстренный ремонтный набор", "uses": 1, "effect": "+2d8 ХП технике", "price": 150},
+      {"id": "cooling_gel", "name": "Охлаждающий гель", "effect": "+1d8 ХП технике (бонусное действие)", "price": 15},
+      {"id": "repair_foam", "name": "Ремонтная пена", "effect": "+2d8 ХП технике, -1 м скорости на 2 раунда", "price": 80},
+      {"id": "nano_gel", "name": "Нано-гель", "effect": "+3d8 ХП технике", "price": 150},
+      {"id": "reinforcing_sealant", "name": "Укрепляющий герметик", "effect": "+15 временных ХП меху на 1 час", "price": 100},
+      {"id": "second_skin_spray", "name": "Напыление «Вторая кожа»", "effect": "+25 временных ХП меху на 30 минут", "price": 250},
+      {"id": "drive_lubricant", "name": "Смазка для приводов", "effect": "+1 м скорости меху на 1 час", "price": 30},
+      {"id": "thermal_paste", "name": "Термопаста", "effect": "+1 к сбросу тепла на 1 бой", "price": 40},
+      {"id": "emergency_battery", "name": "Аварийный аккумулятор", "effect": "Запустить заглохший реактор", "price": 100},
+      {"id": "fuse_kit", "name": "Комплект предохранителей", "effect": "Починить электрику без проверки TECH", "price": 50},
+      {"id": "duct_tape", "name": "Изолента (моток)", "effect": "+1 к TECH при ремонте (одноразово)", "price": 5}
+    ],
+    "survival": [
+      {"id": "ration", "name": "Сухпаёк (1 день)", "effect": "Еда", "price": 5},
+      {"id": "water", "name": "Очищенная вода (1 л)", "effect": "Вода", "price": 3},
+      {"id": "energy_bar", "name": "Энергетический батончик", "effect": "Снимает 1 уровень истощения на 1 час", "price": 8},
+      {"id": "thermos_coffee", "name": "Термос с кофе", "effect": "Снимает 1 уровень истощения на 1 час", "price": 8},
+      {"id": "oxygen_tank", "name": "Кислородный баллон", "effect": "10 мин дыхания в непригодной атмосфере", "price": 25},
+      {"id": "water_filter", "name": "Фильтр для воды", "uses": 20, "effect": "Очистка воды", "price": 30},
+      {"id": "tent", "name": "Палатка", "effect": "Защита от погоды при отдыхе", "price": 40},
+      {"id": "sleeping_bag", "name": "Спальный мешок", "effect": "+1 к восстановлению ХП во время отдыха", "price": 25},
+      {"id": "flint", "name": "Огниво", "effect": "Развести огонь без батареек", "price": 5},
+      {"id": "flare", "name": "Сигнальная ракета", "effect": "Видна за 5 км", "price": 20},
+      {"id": "heat_pack", "name": "Тепловой патрон", "effect": "Обогрев на 8 часов", "price": 15},
+      {"id": "antirad_suit", "name": "Антирадиационный костюм (одноразовый)", "effect": "Сопротивление радиации на 24 часа", "price": 80}
+    ],
+    "drugs": [
+      {"id": "spark", "name": "«Искра»", "effect": "+1 BS/WS на 10 мин", "side_effect": "1 уровень истощения", "price": 30},
+      {"id": "dust", "name": "«Прах»", "effect": "Иммунитет к состоянию «Ранен» на 1 час", "side_effect": "-2 PER после", "price": 50},
+      {"id": "glitch_dust", "name": "«Глитч-пыль»", "effect": "Видит скрытые сети и аномалии на 10 мин", "side_effect": "Галлюцинации, спас T (Сл 14)", "price": 80},
+      {"id": "machine_blood", "name": "«Кровь машин»", "effect": "+2 TECH на 1 час", "side_effect": "-1 INF на 1 день", "price": 60},
+      {"id": "combat_cocktail", "name": "Боевой коктейль", "effect": "+1 T, +1 STR на 1 бой", "side_effect": "2 уровня истощения после", "price": 100}
+    ]
+  },
+  "tools": [
+    {"id": "multitool", "name": "Мультитул", "effect": "+1 к TECH (мелкая моторика)", "price": 25},
+    {"id": "tablet_decoder", "name": "Планшет-декодер", "effect": "Преимущество на NET при взломе", "price": 70},
+    {"id": "diag_scanner", "name": "Диагностический сканер", "effect": "Определяет точные ХП техники", "price": 60},
+    {"id": "encrypted_radio", "name": "Рация с шифрованием", "effect": "Связь 5 км", "price": 35},
+    {"id": "long_range_radio", "name": "Рация дальняя", "effect": "Связь 20 км", "price": 100},
+    {"id": "neurohelmet", "name": "Нейрошлем пилота", "effect": "Обязателен для управления мехом", "price": 150},
+    {"id": "advanced_neurohelmet", "name": "Нейрошлем продвинутый", "effect": "+1 BS в мехе", "price": 500},
+    {"id": "soldering_kit", "name": "Набор для пайки", "effect": "+1 к TECH (ремонт электроники)", "price": 30},
+    {"id": "portable_3d_printer", "name": "3D-принтер (портативный)", "effect": "Печатает мелкую деталь за 10 мин", "price": 180},
+    {"id": "dosimeter", "name": "Дозиметр", "effect": "Определяет уровень радиации", "price": 35},
+    {"id": "geiger_counter", "name": "Счётчик Гейгера (продвинутый)", "effect": "Определяет тип радиации", "price": 80},
+    {"id": "magnetic_boots", "name": "Магнитные ботинки", "effect": "Ходьба по металлическим стенам", "price": 100},
+    {"id": "freq_sync", "name": "Синхронизатор частот", "effect": "Перехват вражеских переговоров", "price": 90},
+    {"id": "portable_jammer", "name": "Глушилка портативная", "effect": "Блокирует связь в радиусе 10 м на 10 мин", "price": 70},
+    {"id": "signal_booster", "name": "Усилитель сигнала", "effect": "+2 к NET (связь)", "price": 60},
+    {"id": "thermal_scanner", "name": "Тепловизор (ручной)", "effect": "Видит тепловые следы через стены", "price": 150},
+    {"id": "night_vision", "name": "Прибор ночного видения", "effect": "Нет помехи за темноту", "price": 120},
+    {"id": "flashlight", "name": "Фонарь", "effect": "Освещение 10 м", "price": 10},
+    {"id": "powerful_flashlight", "name": "Фонарь мощный", "effect": "Освещение 30 м", "price": 30},
+    {"id": "binoculars", "name": "Бинокль", "effect": "+2 PER на расстоянии 50+ м", "price": 40},
+    {"id": "compass", "name": "Компас", "effect": "Не работает в Мёртвых Зонах", "price": 15},
+    {"id": "basic_map", "name": "Карта региона (базовая)", "effect": "Базовая навигация", "price": 20},
+    {"id": "detailed_map", "name": "Карта региона (подробная)", "effect": "С отмеченными аномалиями", "price": 100},
+    {"id": "cooler_bag", "name": "Сумка-холодильник", "effect": "Хранение органов/образцов", "price": 50},
+    {"id": "sample_container", "name": "Контейнер для образцов", "effect": "Защита от радиации", "price": 30},
+    {"id": "lockpicks", "name": "Взломщик (отмычки)", "effect": "+1 к TECH (взлом замков)", "price": 35},
+    {"id": "fake_id", "name": "Поддельный пропуск Совета", "effect": "Одноразовый доступ", "price": 100},
+    {"id": "handcuffs", "name": "Наручники", "effect": "Захват (Сл 18 STR для взлома)", "price": 25},
+    {"id": "rope", "name": "Верёвка (10 м)", "effect": "Лазание, связывание", "price": 5}
+  ],
+  "grenades": [
+    {"id": "frag_grenade", "name": "Осколочная", "damage": "2d6 оск.", "radius": "3 м", "S_vs_tech": 3, "price": 30},
+    {"id": "emi_grenade", "name": "ЭМИ", "damage": "3d6 электр. технике", "radius": "5 м", "effect": "Оглушение", "S_vs_tech": "особый", "price": 60},
+    {"id": "smoke_grenade", "name": "Дымовая", "effect": "Завеса 10×10 м на 1d4+1 раундов", "price": 15},
+    {"id": "flash_grenade", "name": "Световая", "effect": "Ослепление на 1 раунд (спас T Сл 12)", "radius": "5 м", "price": 25},
+    {"id": "incendiary_grenade", "name": "Зажигательная", "damage": "2d6 огн.", "radius": "3 м", "effect": "Поджигает", "S_vs_tech": 2, "price": 40},
+    {"id": "acid_grenade", "name": "Кислотная", "damage": "2d6 кисл.", "radius": "3 м", "effect": "-1 СУ за попадание", "S_vs_tech": "особый", "price": 50}
+  ],
+  "ammo": [
+    {"id": "ammo_standard_rifle", "name": "Стандартные (винтовка/пистолет)", "effect": "—", "price_per_mag": 15},
+    {"id": "ammo_ap", "name": "Бронебойные", "effect": "+1 S против техники, -1 СУ против пехоты", "price_per_mag": 40},
+    {"id": "ammo_tracer", "name": "Трассирующие", "effect": "Преимущество на следующую атаку по цели", "price_per_mag": 30},
+    {"id": "ammo_incendiary", "name": "Зажигательные", "effect": "При пробитии — поджигает", "price_per_mag": 45},
+    {"id": "ammo_explosive", "name": "Разрывные", "effect": "+1d6 урона, -1 S", "price_per_mag": 60},
+    {"id": "ammo_emi", "name": "ЭМИ-пули", "effect": "+1d4 электрического технике", "price_per_mag": 50}
+  ]
+}

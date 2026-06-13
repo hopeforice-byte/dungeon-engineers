@@ -1,0 +1,629 @@
+/* ==================== ОБЩИЕ СТИЛИ ==================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #0a0a0a;
+    font-family: 'Share Tech Mono', 'Inter', monospace;
+    color: #ccc;
+    padding: 16px;
+    line-height: 1.5;
+}
+
+/* Анимации */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+@keyframes borderGlow {
+    0%, 100% { border-color: #2a2a2a; box-shadow: 0 0 0px rgba(240,165,0,0); }
+    50% { border-color: #f0a500; box-shadow: 0 0 10px rgba(240,165,0,0.3); }
+}
+
+/* Стилизация скроллбара */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #1a1a1a; }
+::-webkit-scrollbar-thumb { background: #f0a500; border-radius: 4px; }
+
+/* Контейнер */
+.app-container {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Шапка */
+.header {
+    background: #0f0f0f;
+    padding: 16px 24px;
+    border-bottom: 2px solid #f0a500;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    border-radius: 12px 12px 0 0;
+    animation: slideDown 0.5s ease;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    cursor: pointer;
+    transition: opacity 0.3s;
+}
+
+.logo:hover { opacity: 0.8; }
+
+.logo h1 { color: #f0a500; font-size: 1.5rem; letter-spacing: 2px; }
+.logo p { font-size: 0.7rem; color: #888; }
+
+.back-menu-btn {
+    background: #2a2a2a;
+    border: 1px solid #f0a500;
+    color: #f0a500;
+    padding: 8px 16px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-family: monospace;
+    transition: all 0.3s ease;
+}
+
+.back-menu-btn:hover {
+    background: #f0a500;
+    color: #0a0a0a;
+    transform: scale(0.95);
+}
+
+.action-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.action-btn {
+    background: #2a2a2a;
+    border: none;
+    color: #f0a500;
+    padding: 6px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-family: monospace;
+    transition: all 0.2s;
+}
+
+.action-btn:hover { background: #3a3a3a; transform: scale(0.95); }
+
+/* Layout */
+.main-layout { display: flex; gap: 20px; flex-wrap: wrap; animation: fadeIn 0.5s ease; }
+
+.sidebar {
+    width: 300px;
+    background: #0f0f0f;
+    border-radius: 12px;
+    padding: 16px;
+    border: 1px solid #2a2a2a;
+}
+
+.content {
+    flex: 1;
+    min-width: 300px;
+    background: #0f0f0f;
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid #2a2a2a;
+}
+
+/* Карточка персонажа */
+.char-card { text-align: center; margin-bottom: 20px; }
+
+.char-name-input {
+    background: #1a1a1a;
+    border: 1px solid #f0a500;
+    color: #f0a500;
+    padding: 8px 12px;
+    font-size: 1.2rem;
+    text-align: center;
+    border-radius: 8px;
+    width: 100%;
+    font-family: monospace;
+    transition: all 0.3s;
+}
+
+.char-name-input:focus {
+    outline: none;
+    border-color: #ffb820;
+    box-shadow: 0 0 10px rgba(240,165,0,0.3);
+}
+
+.char-level { margin-top: 8px; font-size: 0.9rem; }
+
+.level-up-btn {
+    background: #f0a500;
+    color: #0a0a0a;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    margin-top: 8px;
+    font-weight: bold;
+    width: 100%;
+    transition: all 0.3s ease;
+}
+
+.level-up-btn:hover { background: #ffb820; transform: scale(0.98); }
+
+/* Статы */
+.stat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin: 16px 0;
+}
+
+.stat-item {
+    background: #1a1a1a;
+    padding: 8px;
+    border-radius: 8px;
+    text-align: center;
+    transition: all 0.3s;
+}
+
+.stat-item:hover { transform: translateY(-2px); background: #222; }
+
+.stat-label { font-size: 0.7rem; color: #888; }
+.stat-value { font-size: 1.2rem; font-weight: bold; color: #f0a500; }
+
+/* HP менеджер */
+.hp-manager {
+    background: #1a1a1a;
+    border-radius: 12px;
+    padding: 12px;
+    margin: 16px 0;
+}
+
+.hp-bar {
+    background: #2a2a2a;
+    height: 12px;
+    border-radius: 6px;
+    overflow: hidden;
+    margin: 8px 0;
+}
+
+.hp-fill { height: 100%; transition: width 0.3s ease; }
+.hp-fill.green { background: #2ecc71; }
+.hp-fill.yellow { background: #f39c12; }
+.hp-fill.red { background: #e74c3c; }
+
+.hp-controls {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+    justify-content: center;
+}
+
+.hp-btn {
+    background: #2a2a2a;
+    border: none;
+    color: #f0a500;
+    padding: 4px 10px;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.hp-btn:hover { background: #3a3a3a; transform: scale(0.95); }
+
+/* Отчуждение */
+.alienation-container { margin: 12px 0; }
+.alienation-bar {
+    background: #2a2a2a;
+    height: 10px;
+    border-radius: 5px;
+    overflow: hidden;
+}
+.alienation-fill { height: 100%; transition: width 0.3s ease; }
+.alienation-stage { font-size: 0.8rem; margin-top: 4px; }
+
+/* Состояния */
+.conditions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 12px 0;
+}
+
+.condition-badge {
+    background: #2a2a2a;
+    padding: 4px 10px;
+    border-radius: 15px;
+    font-size: 0.7rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.condition-badge.active { background: #e74c3c; color: white; }
+.condition-badge:hover { transform: scale(0.95); }
+
+/* Быстрые броски */
+.quick-rolls { margin-top: 16px; }
+.roll-btn {
+    background: #f0a500;
+    color: #0a0a0a;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 12px;
+    cursor: pointer;
+    margin: 2px;
+    font-size: 0.7rem;
+    transition: all 0.2s;
+}
+.roll-btn:hover { transform: scale(0.95); background: #ffb820; }
+
+.roll-result {
+    margin-top: 10px;
+    background: #2a2a2a;
+    padding: 8px;
+    border-radius: 8px;
+    text-align: center;
+    animation: fadeIn 0.3s ease;
+}
+
+/* Табы */
+.tabs {
+    display: flex;
+    gap: 4px;
+    border-bottom: 1px solid #2a2a2a;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.tab-btn {
+    background: none;
+    border: none;
+    color: #888;
+    padding: 8px 16px;
+    cursor: pointer;
+    font-family: monospace;
+    transition: all 0.3s;
+}
+
+.tab-btn.active {
+    color: #f0a500;
+    border-bottom: 2px solid #f0a500;
+}
+
+.tab-btn:hover { color: #f0a500; }
+
+.tab-content { display: none; }
+.tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+
+/* Навыки */
+.skills-grid {
+    display: grid;
+    gap: 8px;
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.skill-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    background: #151515;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+.skill-row:hover { background: #1a1a1a; }
+
+.skill-name { width: 100px; font-weight: bold; }
+.skill-slider { flex: 1; min-width: 150px; }
+
+input[type="range"] {
+    width: 100%;
+    background: #2a2a2a;
+    height: 4px;
+    border-radius: 2px;
+    -webkit-appearance: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    background: #f0a500;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+
+.skill-value {
+    width: 35px;
+    text-align: center;
+    background: #2a2a2a;
+    border-radius: 12px;
+    padding: 4px;
+}
+
+.skill-target {
+    width: 55px;
+    text-align: center;
+    background: #1a1a1a;
+    border-radius: 12px;
+    padding: 4px;
+    font-size: 0.8rem;
+}
+
+.skill-base { font-size: 0.7rem; color: #888; margin-left: 5px; }
+.skill-max-warning { color: #e74c3c; font-size: 0.7rem; }
+.points-left {
+    background: #2a2a2a;
+    padding: 8px 16px;
+    border-radius: 20px;
+    display: inline-block;
+    margin-bottom: 16px;
+}
+
+/* Карточки классов и способностей */
+.class-card {
+    background: #151515;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    border-left: 3px solid #f0a500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.class-card:hover { transform: translateX(5px); background: #1a1a1a; }
+.class-card.selected { background: #2a1f0f; }
+.class-card h4 { color: #f0a500; margin-bottom: 6px; }
+
+.ability-card {
+    background: #151515;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    border-left: 3px solid #f0a500;
+    transition: all 0.2s;
+}
+
+.ability-card:hover { transform: translateX(5px); }
+.ability-card.locked { opacity: 0.5; border-left-color: #555; }
+.ability-card h5 { color: #f0a500; margin-bottom: 4px; }
+
+.grid-2 { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; }
+
+/* Тело для имплантов */
+.human-body { display: flex; justify-content: center; margin-bottom: 24px; }
+.body-svg { width: 200px; cursor: pointer; }
+.body-slot {
+    fill: #2a2a2a;
+    stroke: #f0a500;
+    stroke-width: 2;
+    transition: all 0.2s;
+}
+.body-slot:hover { fill: #3a3a3a; }
+.body-slot.has-implant { fill: #f0a50020; stroke: #f0a500; }
+
+.body-parts {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.body-part {
+    background: #1a1a1a;
+    border-radius: 12px;
+    padding: 12px;
+    text-align: center;
+    border: 1px solid #2a2a2a;
+    transition: all 0.2s;
+}
+
+.body-part:hover { transform: translateY(-2px); border-color: #f0a500; }
+.body-part h4 { color: #f0a500; margin-bottom: 8px; font-size: 0.9rem; }
+.slot-limit { font-size: 0.7rem; color: #888; margin-bottom: 8px; }
+.implants-in-slot { min-height: 60px; margin-top: 8px; }
+
+.implant-badge {
+    background: #2a2a2a;
+    padding: 4px 8px;
+    border-radius: 8px;
+    margin: 4px 0;
+    font-size: 0.7rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    animation: fadeInUp 0.3s ease;
+}
+
+.remove-imp {
+    background: none;
+    border: none;
+    color: #e74c3c;
+    cursor: pointer;
+    margin-left: 8px;
+    transition: transform 0.2s;
+}
+
+.remove-imp:hover { transform: scale(1.2); }
+
+/* Инвентарь */
+.inventory-list {
+    max-height: 400px;
+    overflow-y: auto;
+    margin-bottom: 16px;
+}
+
+.inv-item {
+    background: #151515;
+    padding: 8px 12px;
+    border-radius: 8px;
+    margin-bottom: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    transition: all 0.2s;
+}
+
+.inv-item:hover { background: #1a1a1a; transform: translateX(3px); }
+
+.inv-item-info { flex: 1; }
+.inv-item-name { font-weight: bold; color: #f0a500; }
+.inv-item-stats { font-size: 0.7rem; color: #888; margin-top: 4px; }
+
+.remove-item {
+    background: none;
+    border: none;
+    color: #e74c3c;
+    cursor: pointer;
+    font-size: 1.2rem;
+    padding: 0 8px;
+    transition: transform 0.2s;
+}
+
+.remove-item:hover { transform: scale(1.2); }
+
+.equipped-badge {
+    background: #f0a500;
+    color: #0a0a0a;
+    font-size: 0.6rem;
+    padding: 2px 6px;
+    border-radius: 10px;
+    margin-left: 8px;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+}
+
+.equipped-badge:hover { transform: scale(0.95); }
+
+/* Специализации */
+.spec-badge {
+    background: #2a2a2a;
+    color: #f0a500;
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 15px;
+    margin: 4px;
+    cursor: pointer;
+    border: 1px solid #f0a500;
+    transition: all 0.2s;
+}
+
+.spec-badge:hover { transform: scale(0.95); background: #3a3a3a; }
+.spec-badge.active { background: #f0a500; color: #0a0a0a; }
+
+/* Селекты и кнопки */
+.weapon-select, .armor-select, .consumable-select {
+    width: 100%;
+    padding: 8px;
+    background: #1a1a1a;
+    border: 1px solid #f0a500;
+    color: #ccc;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    font-family: monospace;
+    transition: all 0.2s;
+}
+
+.weapon-select:hover, .armor-select:hover, .consumable-select:hover {
+    border-color: #ffb820;
+}
+
+.btn-primary {
+    background: #f0a500;
+    color: #0a0a0a;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.2s;
+}
+
+.btn-primary:hover { background: #ffb820; transform: scale(0.98); }
+
+.btn-secondary {
+    background: #2a2a2a;
+    color: #f0a500;
+    border: 1px solid #f0a500;
+    padding: 6px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    margin-right: 8px;
+    transition: all 0.2s;
+}
+
+.btn-secondary:hover { background: #3a3a3a; transform: scale(0.95); }
+
+/* История */
+.history-list { max-height: 500px; overflow-y: auto; }
+.history-item {
+    background: #151515;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    border-left: 3px solid #f0a500;
+    transition: all 0.2s;
+}
+
+.history-item:hover { transform: translateX(5px); background: #1a1a1a; }
+
+/* Редкость предметов */
+.rarity-common { color: #aaa; }
+.rarity-uncommon { color: #2ecc71; }
+.rarity-rare { color: #3498db; }
+.rarity-legendary { color: #f39c12; }
+
+/* Загрузка и ошибки */
+.loading { text-align: center; padding: 50px; color: #f0a500; animation: pulse 1.5s infinite; }
+.error-message { text-align: center; padding: 50px; color: #e74c3c; }
+
+/* Адаптив */
+@media (max-width: 768px) {
+    body { padding: 8px; }
+    .sidebar { width: 100%; }
+    .skill-row { flex-direction: column; align-items: stretch; }
+    .skill-name { width: auto; }
+    .body-parts { grid-template-columns: repeat(2, 1fr); }
+}
