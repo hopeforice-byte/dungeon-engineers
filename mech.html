@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Инженеры Подземелий — Лист Меха</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #0a0a0a; font-family: 'Share Tech Mono', monospace; color: #ccc; padding: 20px; }
+        .container { max-width: 1600px; margin: 0 auto; }
+        
+        .header {
+            background: #0f0f0f; padding: 16px 24px; border-bottom: 2px solid #f0a500;
+            display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;
+            gap: 12px; margin-bottom: 20px; border-radius: 12px;
+        }
+        .logo { display: flex; align-items: center; gap: 15px; cursor: pointer; }
+        .logo h1 { color: #f0a500; font-size: 1.5rem; }
+        .action-buttons { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+        .action-btn, .prebuilt-select {
+            background: #2a2a2a; border: none; color: #f0a500; padding: 6px 12px;
+            border-radius: 20px; cursor: pointer; font-family: monospace;
+        }
+        .prebuilt-select { background: #1a2a1a; border: 1px solid #2ecc71; color: #2ecc71; }
+        .back-menu-btn { background: #2a2a2a; border: 1px solid #f0a500; color: #f0a500; padding: 6px 12px; border-radius: 20px; cursor: pointer; }
+        .back-menu-btn:hover { background: #f0a500; color: #0a0a0a; }
+        
+        .accordion {
+            background: #0f0f0f; border-radius: 16px; border: 1px solid #2a2a2a; margin-bottom: 16px;
+        }
+        .accordion-header {
+            background: #1a1a1a; padding: 12px 16px; cursor: pointer; display: flex;
+            justify-content: space-between; align-items: center; border-radius: 16px;
+            font-weight: bold; color: #f0a500;
+        }
+        .accordion-header .arrow { transition: transform 0.2s; }
+        .accordion-header.open .arrow { transform: rotate(180deg); }
+        .accordion-content { display: none; padding: 16px; border-top: 1px solid #2a2a2a; }
+        .accordion-content.open { display: block; }
+        
+        .mech-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .card { background: #0f0f0f; border-radius: 16px; border: 1px solid #2a2a2a; overflow: hidden; }
+        .card-header { background: #1a1a1a; padding: 12px 16px; font-weight: bold; color: #f0a500; }
+        .card-body { padding: 16px; }
+        
+        .hologram {
+            background: linear-gradient(135deg, #0a0a2a, #0a0a1a); border-radius: 16px;
+            padding: 16px; text-align: center; border: 1px solid #00ffff33;
+            box-shadow: 0 0 20px rgba(0,255,255,0.1); margin-bottom: 16px; transition: all 0.3s;
+        }
+        .hologram.destroyed { filter: grayscale(0.8); border-color: #e74c3c; box-shadow: 0 0 20px rgba(231,76,60,0.3); }
+        .hologram-title { font-size: 0.7rem; color: #00ffff; margin-bottom: 12px; }
+        .destroyed .hologram-title { color: #e74c3c; }
+        .mech-svg { width: 100%; max-width: 300px; margin: 0 auto; }
+        
+        select, input {
+            width: 100%; padding: 8px 12px; background: #1a1a1a;
+            border: 1px solid #2a2a2a; color: #ccc; border-radius: 8px;
+            font-family: monospace; font-size: 0.85rem;
+        }
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; font-size: 0.7rem; color: #888; margin-bottom: 4px; }
+        
+        .components-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .stat-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
+        .hp-controls, .heat-controls { display: flex; gap: 5px; flex-wrap: wrap; }
+        .hp-btn, .heat-btn {
+            background: #2a2a2a; border: none; color: #f0a500; padding: 4px 10px;
+            border-radius: 15px; cursor: pointer; font-size: 0.7rem;
+        }
+        .heat-bar { background: #2a2a2a; height: 12px; border-radius: 6px; overflow: hidden; margin: 8px 0; }
+        .heat-fill { height: 100%; transition: width 0.3s; }
+        .heat-fill.normal { background: #2ecc71; }
+        .heat-fill.warning { background: #f39c12; }
+        .heat-fill.overheat { background: #e67e22; }
+        .heat-fill.critical { background: #e74c3c; }
+        
+        .weapon-slot { background: #1a1a1a; border-radius: 12px; padding: 12px; margin-bottom: 12px; }
+        .weapon-info { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; font-size: 0.75rem; color: #888; }
+        
+        .btn-primary {
+            background: #f0a500; color: #0a0a0a; border: none; padding: 8px 16px;
+            border-radius: 20px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 8px;
+        }
+        .btn-primary:disabled, .btn-secondary:disabled, .btn-success:disabled { opacity: 0.4; cursor: not-allowed; }
+        .btn-secondary { background: #2a2a2a; color: #f0a500; border: 1px solid #f0a500; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 0.75rem; }
+        .btn-success { background: #2ecc71; color: #0a0a0a; border: none; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 0.75rem; }
+        
+        .result-box { background: #1a1a1a; padding: 12px; border-radius: 8px; margin-top: 12px; border-left: 3px solid #f0a500; }
+        .crit-history { max-height: 150px; overflow-y: auto; font-size: 0.7rem; }
+        .crit-history div { padding: 4px 8px; border-bottom: 1px solid #2a2a2a; }
+        .resource-counter { display: flex; align-items: center; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+        .targets-group { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+        
+        .destroyed-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); display: flex; justify-content: center;
+            align-items: center; z-index: 1000;
+        }
+        .destroyed-message {
+            background: #1a1a1a; border: 2px solid #e74c3c; border-radius: 24px;
+            padding: 32px; text-align: center; max-width: 400px;
+        }
+        .destroyed-message h2 { color: #e74c3c; font-size: 2rem; margin-bottom: 16px; }
+        
+        @media (max-width: 1200px) { .mech-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="logo" onclick="goToMainMenu()"><h1>⚙️ Инженеры Подземелий</h1><p>лист меха</p></div>
+        <div class="action-buttons">
+            <select id="prebuiltSelect" class="prebuilt-select" onchange="loadPrebuiltMech()"><option value="">— Готовые сборки —</option></select>
+            <button class="action-btn" onclick="exportMech()">📤 Экспорт</button>
+            <button class="action-btn" onclick="importMech()">📥 Импорт</button>
+            <button class="action-btn" onclick="printMech()">🖨️ Печать</button>
+            <button class="back-menu-btn" onclick="goToMainMenu()">🏠 Главное меню</button>
+        </div>
+    </div>
+
+    <div class="hologram" id="hologram">
+        <div class="hologram-title">⚡ ГОЛОГРАФИЧЕСКАЯ ПРОЕКЦИЯ МЕХА ⚡</div>
+        <svg class="mech-svg" viewBox="0 0 400 400">
+            <rect x="150" y="120" width="100" height="120" rx="10" fill="#1a1a2a" stroke="#00ffff" stroke-width="2" id="body_part"/>
+            <rect x="175" y="130" width="50" height="40" rx="5" fill="#2a2a3a" stroke="#00ffff" stroke-width="2" id="cabin_part"/>
+            <circle cx="200" cy="105" r="20" fill="#1a1a2a" stroke="#00ffff" stroke-width="2" id="head_part"/>
+            <rect x="250" y="140" width="60" height="30" rx="5" fill="#1a1a2a" stroke="#00ffff" stroke-width="2" id="right_arm_part"/>
+            <rect x="300" y="170" width="40" height="20" rx="3" fill="#2a2a3a" stroke="#00ffff" stroke-width="1" id="right_weapon"/>
+            <rect x="90" y="140" width="60" height="30" rx="5" fill="#1a1a2a" stroke="#00ffff" stroke-width="2" id="left_arm_part"/>
+            <rect x="60" y="170" width="40" height="20" rx="3" fill="#2a2a3a" stroke="#00ffff" stroke-width="1" id="left_weapon"/>
+            <rect x="170" y="240" width="35" height="80" rx="5" fill="#1a1a2a" stroke="#00ffff" stroke-width="2" id="right_leg_part"/>
+            <rect x="195" y="240" width="35" height="80" rx="5" fill="#1a1a2a" stroke="#00ffff" stroke-width="2" id="left_leg_part"/>
+            <circle cx="200" cy="200" r="80" fill="none" stroke="#00ffff" stroke-width="0.5" stroke-dasharray="4">
+                <animateTransform attributeName="transform" type="rotate" from="0 200 200" to="360 200 200" dur="20s" repeatCount="indefinite"/>
+            </circle>
+        </svg>
+        <div style="display: flex; justify-content: center; gap: 16px; margin-top: 12px;">
+            <div><span style="color:#00ffff;">●</span> Корпус</div>
+            <div><span id="hologramWeapons">Оружие: нет</span></div>
+            <div><span style="color:#e74c3c;">●</span> Повреждения</div>
+        </div>
+    </div>
+
+    <div class="mech-grid">
+        <div>
+            <div class="card">
+                <div class="card-header">🚀 Шасси и характеристики</div>
+                <div class="card-body">
+                    <div class="form-group"><label>Название меха</label><input type="text" id="mechName"></div>
+                    <div class="form-group"><label>Пилот</label><input type="text" id="pilotName"></div>
+                    <div class="form-group"><label>Шасси</label><select id="chassisSelect"></select></div>
+                    <div class="stat-row"><span>❤️ ХП:</span><div class="hp-controls"><button class="hp-btn" onclick="modifyHP(-10)">-10</button><button class="hp-btn" onclick="modifyHP(-5)">-5</button><button class="hp-btn" onclick="modifyHP(-1)">-1</button><span id="hpCurrent">0</span> / <span id="hpMax">0</span><button class="hp-btn" onclick="modifyHP(1)">+1</button><button class="hp-btn" onclick="modifyHP(5)">+5</button><button class="hp-btn" onclick="modifyHP(10)">+10</button></div></div>
+                    <div class="stat-row"><span>🔥 Тепло:</span><div class="heat-controls"><button class="heat-btn" onclick="modifyHeat(-5)">-5</button><button class="heat-btn" onclick="modifyHeat(-1)">-1</button><span id="heatCurrent">0</span><button class="heat-btn" onclick="modifyHeat(1)">+1</button><button class="heat-btn" onclick="modifyHeat(5)">+5</button><button class="heat-btn" onclick="resetHeat()">Сброс</button></div></div>
+                    <div class="heat-bar"><div class="heat-fill" id="heatFill" style="width:0%"></div></div>
+                    <div class="stat-row"><span>❄️ Сброс тепла:</span><span id="heatDissipation">0</span></div>
+                    <div class="stat-row"><span>🛡️ ТБ: <span id="statTB">0</span> | ⚡ СУ: <span id="statSU">0</span> | 🏃 Скорость: <span id="statSpeed">0</span>м</span></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">⚙️ Компоненты</div>
+                <div class="card-body">
+                    <div class="components-grid">
+                        <div><label>Реактор</label><select id="reactorSelect"></select></div>
+                        <div><label>Броня</label><select id="armorSelect"></select></div>
+                        <div><label>Привод (правый)</label><select id="driveRightSelect"></select></div>
+                        <div><label>Привод (левый)</label><select id="driveLeftSelect"></select></div>
+                        <div><label>Манипулятор (правый)</label><select id="manipRightSelect"></select></div>
+                        <div><label>Манипулятор (левый)</label><select id="manipLeftSelect"></select></div>
+                        <div><label>Кабина</label><select id="cabinSelect"></select></div>
+                        <div><label>Нейрошлем</label><select id="neuroSelect"></select></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card"><div class="card-header">🔫 Вооружение</div><div class="card-body" id="weaponsContainer"></div></div>
+        </div>
+
+        <div>
+            <div class="accordion"><div class="accordion-header" onclick="toggleAccordion(this)"><span>💔 ПОЛУЧИТЬ УРОН</span><span class="arrow">▼</span></div>
+                <div class="accordion-content">
+                    <div class="form-group"><label>Входящий урон</label><input type="number" id="incomingDamage" value="0"></div>
+                    <div class="form-group"><label>Тип урона</label><select id="damageTypeSelect"><option value="kinetic">Кинетический</option><option value="laser">Лазерный</option><option value="explosive">Взрывной</option><option value="fire">Огненный</option><option value="electric">Электрический</option><option value="acid">Кислотный</option></select></div>
+                    <div class="form-group"><label>S атаки</label><input type="number" id="attackerS" value="5" min="1" max="10"></div>
+                    <div class="form-group"><label>Попадание в часть</label>
+                        <div class="targets-group">
+                            <button class="btn-secondary" onclick="setTargetLocation('корпус')">Корпус</button>
+                            <button class="btn-secondary" onclick="setTargetLocation('правая_рука')">Пр. рука</button>
+                            <button class="btn-secondary" onclick="setTargetLocation('левая_рука')">Лев. рука</button>
+                            <button class="btn-secondary" onclick="setTargetLocation('правая_нога')">Пр. нога</button>
+                            <button class="btn-secondary" onclick="setTargetLocation('левая_нога')">Лев. нога</button>
+                            <button class="btn-secondary" onclick="setTargetLocation('кабина')">Кабина</button>
+                            <button class="btn-secondary" onclick="setTargetLocation('случайно')">🎲 Случайно</button>
+                        </div>
+                        <input type="text" id="targetLocation" readonly placeholder="Выберите часть" style="margin-top:8px;">
+                    </div>
+                    <button class="btn-primary" id="applyDamageBtn" onclick="applyDamageToMech()">💔 ПРИМЕНИТЬ УРОН</button>
+                    <div id="damageTakenResult" class="result-box"></div>
+                </div>
+            </div>
+
+            <div class="accordion"><div class="accordion-header" onclick="toggleAccordion(this)"><span>🎯 БЫСТРЫЙ БОЙ</span><span class="arrow">▼</span></div>
+                <div class="accordion-content">
+                    <div class="form-group"><label>Оружие</label><select id="quickWeaponSelect"></select></div>
+                    <div class="form-group"><label>Боеприпас</label><select id="quickAmmoSelect"><option value="standard">Стандартный</option><option value="ap">Бронебойный (+1 S)</option><option value="subcaliber">Подкалиберный (+2 S, -1d6)</option><option value="incendiary">Зажигательный (+1d6)</option></select></div>
+                    <div class="form-group"><label>ТБ цели</label><select id="quickTBSelect"><option value="0">Т0</option><option value="1">Т1</option><option value="2">Т2</option><option value="3">Т3</option><option value="4">Т4</option><option value="5">Т5</option><option value="6">Т6</option><option value="7">Т7</option></select></div>
+                    <div class="form-group"><label>BS пилота</label><input type="number" id="quickBS" value="5" min="1" max="10"></div>
+                    <button class="btn-primary" id="quickAttackBtn" onclick="quickAttack()">⚔️ АТАКОВАТЬ!</button>
+                    <div id="quickResult" class="result-box"></div>
+                </div>
+            </div>
+
+            <div class="accordion"><div class="accordion-header" onclick="toggleAccordion(this)"><span>🔥 ОЧЕРЕДЬ</span><span class="arrow">▼</span></div>
+                <div class="accordion-content">
+                    <div class="form-group"><label>Оружие</label><select id="burstWeaponSelect"></select></div>
+                    <div class="form-group"><label>Режим</label><select id="burstModeSelect"><option value="short">Короткая очередь</option><option value="long">Длинная очередь (+1 атака)</option><option value="suppressive">Подавление</option></select></div>
+                    <div class="form-group"><label>Количество целей</label><input type="number" id="burstTargets" value="1" min="1" max="5"></div>
+                    <button class="btn-primary" id="burstAttackBtn" onclick="burstAttack()">🔥 СТРЕЛЬБА</button>
+                    <div id="burstResult" class="result-box"></div>
+                </div>
+            </div>
+
+            <div class="accordion"><div class="accordion-header" onclick="toggleAccordion(this)"><span>🚀 ЗАЛП (ракеты)</span><span class="arrow">▼</span></div>
+                <div class="accordion-content">
+                    <div class="form-group"><label>Ракетная установка</label><select id="salvoWeaponSelect"></select></div>
+                    <div class="form-group"><label>Количество целей</label><input type="number" id="salvoTargets" value="1" min="1" max="5" onchange="updateSalvoSplit()"></div>
+                    <div class="form-group"><label>Распределение ракет</label><div id="salvoSliders"></div></div>
+                    <div class="form-group"><label>BS пилота</label><input type="number" id="salvoBS" value="5" min="1" max="10"></div>
+                    <button class="btn-primary" id="salvoAttackBtn" onclick="salvoAttack()">🚀 ЗАЛП</button>
+                    <div id="salvoResult" class="result-box"></div>
+                </div>
+            </div>
+
+            <div class="accordion"><div class="accordion-header" onclick="toggleAccordion(this)"><span>🌡️ ТЕПЛО</span><span class="arrow">▼</span></div>
+                <div class="accordion-content">
+                    <input type="range" id="heatSlider" min="0" max="20" value="0" oninput="updateHeatFromSlider()">
+                    <div id="heatStateDisplay" class="result-box">Норма</div>
+                    <div class="resource-counter">
+                        <button class="btn-secondary" id="addHeat1Btn" onclick="addHeat(1)">+1</button>
+                        <button class="btn-secondary" id="addHeat5Btn" onclick="addHeat(5)">+5</button>
+                        <button class="btn-secondary" id="resetHeatBtn" onclick="resetHeat()">Сброс</button>
+                        <button class="btn-success" id="emergencyCoolingBtn" onclick="emergencyCooling()">❄️ Аварийный сброс (1/бой)</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion"><div class="accordion-header" onclick="toggleAccordion(this)"><span>💀 КРИТИЧЕСКИЕ ПОВРЕЖДЕНИЯ</span><span class="arrow">▼</span></div>
+                <div class="accordion-content">
+                    <button class="btn-secondary" id="rollCritBtn" onclick="rollCritical()">🎲 БРОСИТЬ КРИТ</button>
+                    <div id="critResult" class="result-box"></div>
+                    <div id="critHistory" class="crit-history"><div>История критов</div></div>
+                </div>
+            </div>
+
+            <div class="accordion"><div class="accordion-header" onclick="toggleAccordion(this)"><span>🔧 РЕМОНТ</span><span class="arrow">▼</span></div>
+                <div class="accordion-content">
+                    <div class="resource-counter"><span>Ремнаборы:</span><button class="btn-secondary" onclick="modifyRepairKits(-1)">-1</button><span id="repairKits">3</span><button class="btn-secondary" onclick="modifyRepairKits(1)">+1</button></div>
+                    <button class="btn-success" id="quickRepairBtn" onclick="quickRepair()">🔧 Быстрый ремонт (1d4+2)</button>
+                    <button class="btn-success" id="standardRepairBtn" onclick="standardRepair()">🔧 Стандартный ремонт (2d4+4)</button>
+                    <button class="btn-success" id="emergencyRepairBtn" onclick="emergencyRepair()">⚡ Экстренный ремонт (3d4+6)</button>
+                    <div id="repairResult" class="result-box"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="destroyedModal" class="destroyed-overlay" style="display: none;">
+    <div class="destroyed-message">
+        <h2>💀 МЕХ УНИЧТОЖЕН 💀</h2>
+        <p style="margin: 16px 0;">Мех выведен из строя и не может действовать до завершения ремонта.</p>
+        <p style="margin: 16px 0; color: #2ecc71;">Для восстановления используйте панель <strong>«РЕМОНТ»</strong>.</p>
+        <button class="btn-primary" onclick="closeDestroyedModal()" style="width: auto; padding: 8px 24px;">Понятно</button>
+    </div>
+</div>
+
+<script>
+    // Данные
+    let CHASSIS_DATA = [], REACTORS_DATA = [], ARMOR_DATA = [], DRIVES_DATA = [], MANIPULATORS_DATA = [];
+    let CABINS_DATA = [], NEUROHELMETS_DATA = [], WEAPONS_DATA = [], PREBUILT_MECHS = [];
+    
+    let mechData = {
+        name: "Новый мех", pilot: "Неизвестный", chassisId: null,
+        reactorId: null, armorId: null, driveRightId: null, driveLeftId: null,
+        manipRightId: null, manipLeftId: null, cabinId: null, neuroId: null,
+        weapons: {}, currentHP: 0, currentHeat: 0, repairKits: 3, emergencyUsed: false,
+        isDestroyed: false,
+        damage: { корпус:0, правая_рука:0, левая_рука:0, правая_нога:0, левая_нога:0, кабина:0 }
+    };
+    
+    let targetLocation = "", critHistory = [], repairKits = 3, emergencyUsed = false;
+    
+    const PENETRATION_TABLE = {3:[2,2,3,4,5,6,null,null],4:[2,2,2,3,4,5,6,null],5:[2,2,2,2,3,4,5,6],6:[2,2,2,2,2,3,4,5],7:[2,2,2,2,2,2,3,4],8:[2,2,2,2,2,2,2,3],9:[2,2,2,2,2,2,2,2],10:[2,2,2,2,2,2,2,2]};
+    const CRIT_TABLE = [
+        {roll:1, component:"Реактор", effect:"+5 тепла, +2 тепла/ход"},
+        {roll:2, component:"Сенсоры/Связь", effect:"Помеха на BS, обзор 15 м"},
+        {roll:3, component:"Правое орудие", effect:"Помеха на атаки правым орудием"},
+        {roll:4, component:"Левое орудие", effect:"Помеха на атаки левым орудием"},
+        {roll:5, component:"Приводы", effect:"-50% скорости"},
+        {roll:6, component:"Броня", effect:"-2 СУ"}
+    ];
+    
+    // Базовые функции
+    function getChassis() { return CHASSIS_DATA.find(c=>c.id===mechData.chassisId); }
+    function getArmor() { return ARMOR_DATA.find(a=>a.id===mechData.armorId); }
+    function getReactor() { return REACTORS_DATA.find(r=>r.id===mechData.reactorId); }
+    function calculateMaxHP() { const c=getChassis(); return c ? c.hp : 0; }
+    function calculateTB() { const c=getChassis(), a=getArmor(); return c ? (c.TB + (a?.TB_bonus||0)) : 0; }
+    function calculateSU() { const c=getChassis(), a=getArmor(); return c ? (c.SU + (a?.SU_bonus||0)) : 0; }
+    function calculateSpeed() { let s=getChassis()?.speed||0; const d=DRIVES_DATA.find(d=>d.id===mechData.driveRightId); if(d?.speed_bonus) s+=d.speed_bonus; return Math.max(1,s); }
+    function calculateHeatDissipation() { const r=getReactor(); return r?.heat_dissipation || 3; }
+    
+    function rollDamage(str) { const m=str.match(/(\d+)d(\d+)/); if(!m) return 0; let t=0; for(let i=0;i<parseInt(m[1]);i++) t+=Math.floor(Math.random()*parseInt(m[2]))+1; return t; }
+    function getBSTarget(bs) { if(bs>=9) return 2; if(bs>=7) return 3; if(bs>=5) return 4; if(bs>=3) return 5; return 6; }
+    
+    // Обновление UI в зависимости от состояния
+    function updateUIByDestroyedState() {
+        const destroyed = mechData.isDestroyed;
+        const btns = ['quickAttackBtn','burstAttackBtn','salvoAttackBtn','applyDamageBtn','rollCritBtn',
+                      'quickRepairBtn','standardRepairBtn','emergencyRepairBtn','addHeat1Btn','addHeat5Btn','resetHeatBtn','emergencyCoolingBtn'];
+        const selects = ['quickWeaponSelect','quickAmmoSelect','quickTBSelect','quickBS','burstWeaponSelect','burstModeSelect','burstTargets',
+                         'salvoWeaponSelect','salvoTargets','salvoBS','damageTypeSelect','attackerS','chassisSelect','reactorSelect',
+                         'armorSelect','driveRightSelect','driveLeftSelect','manipRightSelect','manipLeftSelect','cabinSelect','neuroSelect'];
+        btns.forEach(id => { const btn = document.getElementById(id); if(btn) btn.disabled = destroyed; });
+        selects.forEach(id => { const sel = document.getElementById(id); if(sel) sel.disabled = destroyed; });
+        
+        const hologram = document.getElementById('hologram');
+        if(hologram) destroyed ? hologram.classList.add('destroyed') : hologram.classList.remove('destroyed');
+        
+        if(destroyed && mechData.currentHP <= 0) document.getElementById('destroyedModal').style.display = 'flex';
+        else document.getElementById('destroyedModal').style.display = 'none';
+    }
+    
+    function updateAllStats() {
+        const maxHP = calculateMaxHP();
+        if(mechData.currentHP > maxHP) mechData.currentHP = maxHP;
+        if(mechData.currentHP <= 0 && !mechData.isDestroyed) { mechData.isDestroyed = true; mechData.currentHP = 0; updateUIByDestroyedState(); }
+        if(mechData.currentHP > 0 && mechData.isDestroyed) { mechData.isDestroyed = false; updateUIByDestroyedState(); }
+        
+        document.getElementById('hpMax').innerText = maxHP;
+        document.getElementById('hpCurrent').innerText = mechData.currentHP;
+        document.getElementById('statTB').innerText = calculateTB();
+        document.getElementById('statSU').innerText = calculateSU();
+        document.getElementById('statSpeed').innerText = calculateSpeed();
+        document.getElementById('heatDissipation').innerText = calculateHeatDissipation();
+        
+        const heat = mechData.currentHeat || 0;
+        document.getElementById('heatFill').style.width = Math.min(100,(heat/20)*100)+'%';
+        document.getElementById('heatCurrent').innerText = heat;
+        document.getElementById('heatSlider').value = heat;
+        let state = heat>=16?"Критический":heat>=11?"Перегрев":heat>=6?"Нагрев":"Норма";
+        document.getElementById('heatStateDisplay').innerHTML = state;
+        
+        // Обновление списков оружия
+        const qs = document.getElementById('quickWeaponSelect');
+        if(qs) { qs.innerHTML = '<option value="">— оружие —</option>';
+            for(let k in mechData.weapons) { const w=WEAPONS_DATA.find(w=>w.id===mechData.weapons[k]); if(w) qs.innerHTML += `<option value="${w.id}">${w.name}</option>`; }
+        }
+        const bs = document.getElementById('burstWeaponSelect');
+        if(bs) { bs.innerHTML = '<option value="">— оружие —</option>';
+            for(let k in mechData.weapons) { const w=WEAPONS_DATA.find(w=>w.id===mechData.weapons[k]); if(w && (w.type==='Баллистическое')) bs.innerHTML += `<option value="${w.id}">${w.name}</option>`; }
+        }
+        const ss = document.getElementById('salvoWeaponSelect');
+        if(ss) { ss.innerHTML = '<option value="">— ракеты —</option>';
+            for(let k in mechData.weapons) { const w=WEAPONS_DATA.find(w=>w.id===mechData.weapons[k]); if(w && w.type==='Ракетное') ss.innerHTML += `<option value="${w.id}">${w.name}</option>`; }
+        }
+        
+        // Голограмма
+        let wc=0; for(let k in mechData.weapons) if(mechData.weapons[k]) wc++;
+        document.getElementById('hologramWeapons').innerHTML = `Оружие: ${wc} ед.`;
+        for(let part in mechData.damage) {
+            const el = document.getElementById(part + '_part');
+            if(el) el.setAttribute('stroke', mechData.damage[part]>=2 ? '#e74c3c' : (mechData.damage[part]>=1 ? '#f39c12' : '#00ffff'));
+        }
+    }
+    
+    function saveToStorage() { localStorage.setItem('de_mech', JSON.stringify(mechData)); localStorage.setItem('de_mech_kits', repairKits); localStorage.setItem('de_mech_emergency', emergencyUsed); localStorage.setItem('de_mech_crit', JSON.stringify(critHistory)); }
+    function loadFromStorage() {
+        const saved = localStorage.getItem('de_mech');
+        if(saved) { try { const l=JSON.parse(saved); mechData={...mechData,...l}; if(!mechData.damage) mechData.damage={ корпус:0, правая_рука:0, левая_рука:0, правая_нога:0, левая_нога:0, кабина:0 }; } catch(e){} }
+        repairKits = parseInt(localStorage.getItem('de_mech_kits')) || 3;
+        emergencyUsed = localStorage.getItem('de_mech_emergency') === 'true';
+        const hist = localStorage.getItem('de_mech_crit');
+        if(hist) try { critHistory = JSON.parse(hist); document.getElementById('critHistory').innerHTML = critHistory.map(h=>`<div>${h}</div>`).join(''); } catch(e){}
+        document.getElementById('repairKits').innerText = repairKits;
+        if(mechData.name) document.getElementById('mechName').value = mechData.name;
+        if(mechData.pilot) document.getElementById('pilotName').value = mechData.pilot;
+        if(mechData.chassisId) { document.getElementById('chassisSelect').value = mechData.chassisId; selectChassis(); }
+        if(mechData.reactorId) document.getElementById('reactorSelect').value = mechData.reactorId;
+        if(mechData.armorId) document.getElementById('armorSelect').value = mechData.armorId;
+        if(mechData.driveRightId) document.getElementById('driveRightSelect').value = mechData.driveRightId;
+        if(mechData.driveLeftId) document.getElementById('driveLeftSelect').value = mechData.driveLeftId;
+        if(mechData.manipRightId) document.getElementById('manipRightSelect').value = mechData.manipRightId;
+        if(mechData.manipLeftId) document.getElementById('manipLeftSelect').value = mechData.manipLeftId;
+        if(mechData.cabinId) document.getElementById('cabinSelect').value = mechData.cabinId;
+        if(mechData.neuroId) document.getElementById('neuroSelect').value = mechData.neuroId;
+        updateAllStats(); renderWeapons();
+    }
+    
+    function renderWeapons() {
+        const chassis = getChassis();
+        if(!chassis) { document.getElementById('weaponsContainer').innerHTML = '<div>Выберите шасси</div>'; return; }
+        const slots = [{type:'small',name:'Малые',c:chassis.slots?.small||0},{type:'medium',name:'Средние',c:chassis.slots?.medium||0},{type:'large',name:'Крупные',c:chassis.slots?.large||0},{type:'siege',name:'Осадные',c:chassis.slots?.siege||0}];
+        let html = '';
+        for(let s of slots) {
+            for(let i=0;i<s.c;i++) {
+                const key = `${s.type}_${i}`;
+                const wid = mechData.weapons[key];
+                const w = WEAPONS_DATA.find(w=>w.id===wid);
+                html += `<div class="weapon-slot"><strong>${s.name} слот ${i+1}</strong>
+                        <select id="weapon_${key}" onchange="selectWeapon('${key}',this.value)" ${mechData.isDestroyed ? 'disabled' : ''}>
+                        <option value="">— выбрать —</option>
+                        ${WEAPONS_DATA.filter(w=>w.slot===s.type).map(w=>`<option value="${w.id}" ${wid===w.id?'selected':''}>${w.name} — ${w.damage}</option>`).join('')}
+                        </select>${w?`<div class="weapon-info">💥 ${w.damage} | S${w.S} | 📏 ${w.range} | 🔥 ${w.heat}</div>`:''}</div>`;
+            }
+        }
+        document.getElementById('weaponsContainer').innerHTML = html;
+    }
+    
+    window.selectWeapon = function(key,id) { if(mechData.isDestroyed) return; mechData.weapons[key]=id||null; updateAllStats(); renderWeapons(); saveToStorage(); };
+    
+    function initSelects() {
+        document.getElementById('chassisSelect').innerHTML = '<option value="">— Шасси —</option>'+CHASSIS_DATA.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+        document.getElementById('reactorSelect').innerHTML = '<option value="">— Реактор —</option>'+REACTORS_DATA.map(r=>`<option value="${r.id}">${r.name}</option>`).join('');
+        document.getElementById('armorSelect').innerHTML = '<option value="">— Броня —</option>'+ARMOR_DATA.map(a=>`<option value="${a.id}">${a.name}</option>`).join('');
+        const dOpt = '<option value="">— Привод —</option>'+DRIVES_DATA.map(d=>`<option value="${d.id}">${d.name}</option>`).join('');
+        document.getElementById('driveRightSelect').innerHTML = dOpt;
+        document.getElementById('driveLeftSelect').innerHTML = dOpt;
+        const mOpt = '<option value="">— Манипулятор —</option>'+MANIPULATORS_DATA.map(m=>`<option value="${m.id}">${m.name}</option>`).join('');
+        document.getElementById('manipRightSelect').innerHTML = mOpt;
+        document.getElementById('manipLeftSelect').innerHTML = mOpt;
+        document.getElementById('cabinSelect').innerHTML = '<option value="">— Кабина —</option>'+CABINS_DATA.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+        document.getElementById('neuroSelect').innerHTML = '<option value="">— Нейрошлем —</option>'+NEUROHELMETS_DATA.map(n=>`<option value="${n.id}">${n.name}</option>`).join('');
+        
+        for(let id of ['chassisSelect','reactorSelect','armorSelect','driveRightSelect','driveLeftSelect','manipRightSelect','manipLeftSelect','cabinSelect','neuroSelect']) {
+            document.getElementById(id).onchange = () => { if(!mechData.isDestroyed) { updateMechFromSelects(); updateAllStats(); saveToStorage(); } };
+        }
+    }
+    
+    function updateMechFromSelects() {
+        mechData.chassisId = document.getElementById('chassisSelect').value || null;
+        mechData.reactorId = document.getElementById('reactorSelect').value || null;
+        mechData.armorId = document.getElementById('armorSelect').value || null;
+        mechData.driveRightId = document.getElementById('driveRightSelect').value || null;
+        mechData.driveLeftId = document.getElementById('driveLeftSelect').value || null;
+        mechData.manipRightId = document.getElementById('manipRightSelect').value || null;
+        mechData.manipLeftId = document.getElementById('manipLeftSelect').value || null;
+        mechData.cabinId = document.getElementById('cabinSelect').value || null;
+        mechData.neuroId = document.getElementById('neuroSelect').value || null;
+        selectChassis();
+    }
+    
+    function selectChassis() {
+        const chassis = CHASSIS_DATA.find(c=>c.id===mechData.chassisId);
+        if(chassis) {
+            mechData.weapons = {};
+            for(let i=0;i<(chassis.slots?.small||0);i++) mechData.weapons[`small_${i}`]=null;
+            for(let i=0;i<(chassis.slots?.medium||0);i++) mechData.weapons[`medium_${i}`]=null;
+            for(let i=0;i<(chassis.slots?.large||0);i++) mechData.weapons[`large_${i}`]=null;
+            for(let i=0;i<(chassis.slots?.siege||0);i++) mechData.weapons[`siege_${i}`]=null;
+            renderWeapons();
+        }
+    }
+    
+    function fillPrebuiltSelect() {
+        const sel = document.getElementById('prebuiltSelect');
+        sel.innerHTML = '<option value="">— Готовые сборки —</option>';
+        PREBUILT_MECHS.forEach(m => sel.innerHTML += `<option value="${m.id}">${m.name} — ${m.manufacturer}</option>`);
+    }
+    
+    window.loadPrebuiltMech = function() {
+        if(mechData.isDestroyed) { alert("Мех уничтожен! Восстановите через ремонт."); document.getElementById('prebuiltSelect').value = ""; return; }
+        const id = document.getElementById('prebuiltSelect').value;
+        if(!id) return;
+        const prebuilt = PREBUILT_MECHS.find(m => m.id === id);
+        if(!prebuilt) return;
+        if(confirm(`Загрузить "${prebuilt.name}"?`)) {
+            document.getElementById('mechName').value = prebuilt.name;
+            mechData.name = prebuilt.name;
+            if(prebuilt.chassis) { mechData.chassisId = prebuilt.chassis; document.getElementById('chassisSelect').value = prebuilt.chassis; selectChassis(); }
+            mechData.reactorId = prebuilt.reactor || null; if(prebuilt.reactor) document.getElementById('reactorSelect').value = prebuilt.reactor;
+            mechData.armorId = prebuilt.armor || null; if(prebuilt.armor) document.getElementById('armorSelect').value = prebuilt.armor;
+            mechData.driveRightId = prebuilt.right_drive || null; if(prebuilt.right_drive) document.getElementById('driveRightSelect').value = prebuilt.right_drive;
+            mechData.driveLeftId = prebuilt.left_drive || null; if(prebuilt.left_drive) document.getElementById('driveLeftSelect').value = prebuilt.left_drive;
+            mechData.manipRightId = prebuilt.right_manip || null; if(prebuilt.right_manip) document.getElementById('manipRightSelect').value = prebuilt.right_manip;
+            mechData.manipLeftId = prebuilt.left_manip || null; if(prebuilt.left_manip) document.getElementById('manipLeftSelect').value = prebuilt.left_manip;
+            mechData.cabinId = prebuilt.cabin || null; if(prebuilt.cabin) document.getElementById('cabinSelect').value = prebuilt.cabin;
+            mechData.neuroId = prebuilt.neurohelmet || null; if(prebuilt.neurohelmet) document.getElementById('neuroSelect').value = prebuilt.neurohelmet;
+            if(prebuilt.weapons) {
+                let idx=0;
+                for(let key in mechData.weapons) if(idx<prebuilt.weapons.length) mechData.weapons[key]=prebuilt.weapons[idx++];
+            }
+            mechData.currentHP = calculateMaxHP();
+            mechData.currentHeat = 0;
+            mechData.isDestroyed = false;
+            mechData.damage = { корпус:0, правая_рука:0, левая_рука:0, правая_нога:0, левая_нога:0, кабина:0 };
+            updateAllStats(); renderWeapons(); saveToStorage();
+            alert(`✅ Загружена сборка: ${prebuilt.name}`);
+        }
+        document.getElementById('prebuiltSelect').value = "";
+    };
+    
+    window.modifyHP = function(d) {
+        if(mechData.isDestroyed && d<=0) { alert("Мех уничтожен! Используйте ремонт для восстановления."); return; }
+        const maxHP = calculateMaxHP();
+        let newHP = mechData.currentHP + d;
+        if(newHP > maxHP) newHP = maxHP;
+        if(newHP < 0) newHP = 0;
+        mechData.currentHP = newHP;
+        if(mechData.currentHP <= 0 && !mechData.isDestroyed) { mechData.isDestroyed = true; updateUIByDestroyedState(); alert("💀 МЕХ УНИЧТОЖЕН! Используйте ремонт."); }
+        if(mechData.currentHP > 0 && mechData.isDestroyed) { mechData.isDestroyed = false; updateUIByDestroyedState(); }
+        updateAllStats(); saveToStorage();
+    };
+    
+    window.modifyHeat = function(v) { if(mechData.isDestroyed) return; mechData.currentHeat = Math.min(20, Math.max(0, (mechData.currentHeat||0)+v)); updateAllStats(); saveToStorage(); };
+    window.addHeat = window.modifyHeat;
+    window.resetHeat = function() { if(mechData.isDestroyed) return; mechData.currentHeat = 0; updateAllStats(); saveToStorage(); };
+    window.updateHeatFromSlider = function() { if(mechData.isDestroyed) return; mechData.currentHeat = parseInt(document.getElementById('heatSlider').value); updateAllStats(); saveToStorage(); };
+    window.emergencyCooling = function() { if(mechData.isDestroyed) { alert("Мех уничтожен!"); return; } if(emergencyUsed) { alert("Уже использовано!"); return; } const r=Math.floor(Math.random()*12)+2; mechData.currentHeat=Math.max(0,(mechData.currentHeat||0)-r); emergencyUsed=true; updateAllStats(); alert(`❄️ -${r} тепла!`); saveToStorage(); };
+    
+    window.quickAttack = function() {
+        if(mechData.isDestroyed) { alert("Мех уничтожен! Невозможно атаковать."); return; }
+        const wid = document.getElementById('quickWeaponSelect').value;
+        if(!wid) { alert('Выберите оружие!'); return; }
+        const w = WEAPONS_DATA.find(w=>w.id===wid);
+        const ammo = document.getElementById('quickAmmoSelect').value;
+        const tb = parseInt(document.getElementById('quickTBSelect').value);
+        const bs = parseInt(document.getElementById('quickBS').value);
+        let s = w.S;
+        if(ammo==='ap') s++; if(ammo==='subcaliber') s+=2;
+        const hit = Math.floor(Math.random()*10)+1;
+        const target = getBSTarget(bs);
+        let res = `🎯 Попадание: ${hit} vs ${target} → `;
+        if(hit===1 || hit<target) { res += `<strong>❌ ПРОМАХ!</strong>`; document.getElementById('quickResult').innerHTML=res; return; }
+        res += `<strong>✅ ПОПАЛ!</strong><br>🔨 Пробитие: `;
+        const pen = Math.floor(Math.random()*6)+1;
+        const need = PENETRATION_TABLE[Math.min(10,Math.max(3,s))]?.[tb] || 6;
+        res += `${pen} vs ${need} → `;
+        if(pen<need) { res += `<strong>❌ НЕ ПРОБИЛ!</strong>`; document.getElementById('quickResult').innerHTML=res; return; }
+        let dmg = rollDamage(w.damage);
+        if(ammo==='subcaliber') dmg-=6; if(ammo==='incendiary') dmg+=6;
+        if(pen >= need+2) { dmg += rollDamage('1d6'); res += `<strong>КРИТ! +1d6</strong><br>`; }
+        res += `<strong>💥 УРОН: ${Math.max(1,dmg)}</strong>`;
+        document.getElementById('quickResult').innerHTML = res;
+    };
+    
+    window.burstAttack = function() {
+        if(mechData.isDestroyed) { alert("Мех уничтожен! Невозможно атаковать."); return; }
+        const wid = document.getElementById('burstWeaponSelect').value;
+        if(!wid) { alert('Выберите оружие!'); return; }
+        const w = WEAPONS_DATA.find(w=>w.id===wid);
+        const mode = document.getElementById('burstModeSelect').value;
+        let attacks = w.attacks || 2;
+        if(mode==='long') attacks++;
+        if(mode==='suppressive') { document.getElementById('burstResult').innerHTML = `🔥 ПОДАВЛЕНИЕ! Все в конусе подавлены.`; return; }
+        let total=0, hits=0;
+        for(let i=0;i<attacks;i++) {
+            const hit=Math.floor(Math.random()*10)+1;
+            const need=getBSTarget(5);
+            if(hit>=need && hit!==1) { hits++; total+=rollDamage(w.damage); }
+        }
+        document.getElementById('burstResult').innerHTML = `🔥 ОЧЕРЕДЬ: ${hits} попаданий, ${total} урона`;
+    };
+    
+    window.updateSalvoSplit = function() {
+        const targets = parseInt(document.getElementById('salvoTargets').value);
+        const container = document.getElementById('salvoSliders');
+        container.innerHTML = '';
+        for(let i=0;i<targets;i++) {
+            container.innerHTML += `<div style="margin:5px 0;"><label>Цель ${i+1}:</label><input type="range" id="salvoSplit_${i}" min="0" max="100" value="${Math.floor(100/targets)}" oninput="updateSalvoValues()"><span id="salvoVal_${i}">${Math.floor(100/targets)}%</span></div>`;
+        }
+    };
+    function updateSalvoValues() {
+        const targets = parseInt(document.getElementById('salvoTargets').value);
+        let total=0;
+        for(let i=0;i<targets;i++) {
+            const val = parseInt(document.getElementById(`salvoSplit_${i}`)?.value||0);
+            const span = document.getElementById(`salvoVal_${i}`);
+            if(span) span.innerText = val+'%';
+            total+=val;
+        }
+        if(total!==100 && targets>0) { const first=document.getElementById('salvoSplit_0'); if(first) first.value = 100 - (total - (parseInt(first.value)||0)); }
+    }
+    
+    window.salvoAttack = function() {
+        if(mechData.isDestroyed) { alert("Мех уничтожен! Невозможно атаковать."); return; }
+        const wid = document.getElementById('salvoWeaponSelect').value;
+        if(!wid) { alert('Выберите ракетную установку!'); return; }
+        const w = WEAPONS_DATA.find(w=>w.id===wid);
+        const targets = parseInt(document.getElementById('salvoTargets').value);
+        const bs = parseInt(document.getElementById('salvoBS').value);
+        const totalRockets = w.attacks || 4;
+        let result = `🚀 ЗАЛП из ${w.name}: ${totalRockets} ракет, ${targets} целей<br>`;
+        let totalDamage = 0;
+        for(let i=0;i<targets;i++) {
+            const percent = parseInt(document.getElementById(`salvoSplit_${i}`)?.value||0);
+            const rockets = Math.floor(totalRockets * percent / 100);
+            if(rockets===0) continue;
+            const hit = Math.floor(Math.random()*10)+1;
+            const need = getBSTarget(bs);
+            if(hit>=need && hit!==1) {
+                const dmg = rollDamage(w.damage) * Math.ceil(rockets/2);
+                totalDamage += dmg;
+                result += `Цель ${i+1} (${rockets} ракет): ПОПАЛА! Урон ${dmg}<br>`;
+            } else result += `Цель ${i+1} (${rockets} ракет): ПРОМАХ<br>`;
+        }
+        result += `<strong>💥 СУММАРНЫЙ УРОН: ${totalDamage}</strong>`;
+        document.getElementById('salvoResult').innerHTML = result;
+    };
+    
+    window.setTargetLocation = function(loc) {
+        if(loc==='случайно') targetLocation = ['корпус','правая_рука','левая_рука','правая_нога','левая_нога','кабина'][Math.floor(Math.random()*6)];
+        else targetLocation = loc;
+        document.getElementById('targetLocation').value = targetLocation;
+    };
+    
+    window.applyDamageToMech = function() {
+        if(mechData.isDestroyed) { alert("Мех уже уничтожен! Сначала восстановите."); return; }
+        let dmg = parseInt(document.getElementById('incomingDamage').value) || 0;
+        if(dmg <= 0) { alert("Введите урон!"); return; }
+        const attackerS = parseInt(document.getElementById('attackerS').value) || 5;
+        const tb = calculateTB();
+        const need = PENETRATION_TABLE[Math.min(10,Math.max(3,attackerS))]?.[tb-1] || 6;
+        const pen = Math.floor(Math.random()*6)+1;
+        let result = `💥 Урон ${dmg}<br>🔨 Пробитие: ${pen} vs ${need} → `;
+        if(pen<need) { dmg = Math.floor(dmg/2); result += `НЕ ПРОБИЛ! Урон → ${dmg}<br>`; }
+        else result += `ПРОБИЛ!<br>`;
+        const su = calculateSU();
+        dmg = Math.max(1, dmg - su);
+        result += `⚡ СУ ${su}: урон → ${dmg}<br>`;
+        let loc = targetLocation || ['корпус','правая_рука','левая_рука','правая_нога','левая_нога','кабина'][Math.floor(Math.random()*6)];
+        result += `🎯 Попадание: ${loc}<br>`;
+        mechData.currentHP = Math.max(0, mechData.currentHP - dmg);
+        if(mechData.damage[loc]!==undefined && dmg>=15 && mechData.damage[loc]<2) mechData.damage[loc]=2;
+        else if(mechData.damage[loc]!==undefined && dmg>=8 && mechData.damage[loc]<1) mechData.damage[loc]=1;
+        result += `<strong>❤️ ОСТАЛОСЬ ХП: ${mechData.currentHP}/${calculateMaxHP()}</strong>`;
+        if(mechData.currentHP <= 0 && !mechData.isDestroyed) {
+            mechData.isDestroyed = true;
+            result += `<br><strong style="color:#e74c3c;">💀 МЕХ УНИЧТОЖЕН! Действия заблокированы.</strong>`;
+            updateUIByDestroyedState();
+        }
+        document.getElementById('damageTakenResult').innerHTML = result;
+        updateAllStats(); saveToStorage();
+    };
+    
+    window.rollCritical = function() {
+        if(mechData.isDestroyed) { alert("Мех уничтожен!"); return; }
+        const r = Math.floor(Math.random()*6)+1;
+        const c = CRIT_TABLE[r-1];
+        const res = `🎲 КРИТ ${r}: ${c.component} — ${c.effect}`;
+        document.getElementById('critResult').innerHTML = res;
+        critHistory.unshift(`${new Date().toLocaleTimeString()}: ${c.component}`);
+        if(critHistory.length>5) critHistory.pop();
+        document.getElementById('critHistory').innerHTML = critHistory.map(h=>`<div>${h}</div>`).join('');
+        saveToStorage();
+    };
+    
+    window.modifyRepairKits = function(d) { repairKits = Math.max(0, repairKits+d); document.getElementById('repairKits').innerText = repairKits; saveToStorage(); };
+    
+    function repairMech(healAmount, msg) {
+        if(mechData.isDestroyed && healAmount > 0) {
+            repairKits--;
+            document.getElementById('repairKits').innerText = repairKits;
+            mechData.currentHP = Math.min(calculateMaxHP(), mechData.currentHP + healAmount);
+            if(mechData.currentHP > 0) {
+                mechData.isDestroyed = false;
+                updateUIByDestroyedState();
+                alert("🔧 МЕХ ВОССТАНОВЛЕН!");
+            }
+            document.getElementById('repairResult').innerHTML = msg + ` +${healAmount} ХП. Текущее ХП: ${mechData.currentHP}/${calculateMaxHP()}`;
+            updateAllStats(); saveToStorage();
+            return true;
+        } else if(!mechData.isDestroyed && healAmount > 0) {
+            if(repairKits<=0){ alert("Нет ремнаборов!"); return false; }
+            repairKits--;
+            document.getElementById('repairKits').innerText = repairKits;
+            mechData.currentHP = Math.min(calculateMaxHP(), mechData.currentHP + healAmount);
+            document.getElementById('repairResult').innerHTML = msg + ` +${healAmount} ХП. Текущее ХП: ${mechData.currentHP}/${calculateMaxHP()}`;
+            updateAllStats(); saveToStorage();
+            return true;
+        }
+        return false;
+    }
+    
+    window.quickRepair = function() { repairMech(Math.floor(Math.random()*4)+2, "🔧 Быстрый ремонт:"); };
+    window.standardRepair = function() { repairMech(Math.floor(Math.random()*8)+4, "🔧 Стандартный ремонт:"); };
+    window.emergencyRepair = function() { repairMech(Math.floor(Math.random()*12)+6, "⚡ Экстренный ремонт:"); };
+    
+    window.closeDestroyedModal = function() { document.getElementById('destroyedModal').style.display = 'none'; };
+    window.exportMech = function() { const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(mechData,null,2)],{type:'application/json'})); a.download=`${mechData.name||'mech'}.json`; a.click(); };
+    window.importMech = function() { const i=document.createElement('input'); i.type='file'; i.onchange=e=>{ const f=e.target.files[0]; const r=new FileReader(); r.onload=ev=>{ mechData=JSON.parse(ev.target.result); saveToStorage(); location.reload(); }; r.readAsText(f); }; i.click(); };
+    window.printMech = function() { window.print(); };
+    window.goToMainMenu = function() { window.location.href='index.html'; };
+    function toggleAccordion(h) { h.classList.toggle('open'); const c = h.nextElementSibling; if(c) c.classList.toggle('open'); }
+    
+    async function loadData() {
+        try {
+            const [chassis, components, weapons, prebuilt] = await Promise.all([
+                fetch('data_mech/chassis.json').then(r=>r.json()),
+                fetch('data_mech/mech_components.json').then(r=>r.json()),
+                fetch('data_mech/mech_weapons.json').then(r=>r.json()),
+                fetch('data_mech/prebuilt_mechs.json').then(r=>r.json()).catch(()=>({prebuilt_mechs:[]}))
+            ]);
+            CHASSIS_DATA = chassis.chassis || chassis;
+            REACTORS_DATA = components.reactors || [];
+            ARMOR_DATA = components.armor || [];
+            DRIVES_DATA = components.drives || [];
+            MANIPULATORS_DATA = components.manipulators || [];
+            CABINS_DATA = components.cabins || [];
+            NEUROHELMETS_DATA = components.neurohelmets || [];
+            WEAPONS_DATA = weapons.weapons || [];
+            PREBUILT_MECHS = prebuilt.prebuilt_mechs || [];
+            
+            initSelects();
+            loadFromStorage();
+            fillPrebuiltSelect();
+            updateAllStats();
+            renderWeapons();
+            updateUIByDestroyedState();
+        } catch(e) { console.error(e); alert('Ошибка загрузки данных'); }
+    }
+    
+    loadData();
+</script>
+</body>
+</html>
