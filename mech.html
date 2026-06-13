@@ -148,8 +148,8 @@
             <div class="card">
                 <div class="card-header">🚀 Шасси и характеристики</div>
                 <div class="card-body">
-                    <div class="form-group"><label>Название меха</label><input type="text" id="mechName"></div>
-                    <div class="form-group"><label>Пилот</label><input type="text" id="pilotName"></div>
+                    <div class="form-group"><label>Название меха</label><input type="text" id="mechName" placeholder="Новый мех"></div>
+                    <div class="form-group"><label>Пилот</label><input type="text" id="pilotName" placeholder="Пилот"></div>
                     <div class="form-group"><label>Шасси</label><select id="chassisSelect"></select></div>
                     <div class="stat-row"><span>❤️ ХП:</span><div class="hp-controls"><button class="hp-btn" onclick="modifyHP(-10)">-10</button><button class="hp-btn" onclick="modifyHP(-5)">-5</button><button class="hp-btn" onclick="modifyHP(-1)">-1</button><span id="hpCurrent">0</span> / <span id="hpMax">0</span><button class="hp-btn" onclick="modifyHP(1)">+1</button><button class="hp-btn" onclick="modifyHP(5)">+5</button><button class="hp-btn" onclick="modifyHP(10)">+10</button></div></div>
                     <div class="stat-row"><span>🔥 Тепло:</span><div class="heat-controls"><button class="heat-btn" onclick="modifyHeat(-5)">-5</button><button class="heat-btn" onclick="modifyHeat(-1)">-1</button><span id="heatCurrent">0</span><button class="heat-btn" onclick="modifyHeat(1)">+1</button><button class="heat-btn" onclick="modifyHeat(5)">+5</button><button class="heat-btn" onclick="resetHeat()">Сброс</button></div></div>
@@ -306,19 +306,19 @@
     function getChassis() { return CHASSIS_DATA.find(c=>c.id===mechData.chassisId); }
     function getArmor() { return ARMOR_DATA.find(a=>a.id===mechData.armorId); }
     function getReactor() { return REACTORS_DATA.find(r=>r.id===mechData.reactorId); }
+    function getDriveRight() { return DRIVES_DATA.find(d=>d.id===mechData.driveRightId); }
     function calculateMaxHP() { const c=getChassis(); return c ? c.hp : 0; }
     function calculateTB() { const c=getChassis(), a=getArmor(); return c ? (c.TB + (a?.TB_bonus||0)) : 0; }
     function calculateSU() { const c=getChassis(), a=getArmor(); return c ? (c.SU + (a?.SU_bonus||0)) : 0; }
-    function calculateSpeed() { let s=getChassis()?.speed||0; const d=DRIVES_DATA.find(d=>d.id===mechData.driveRightId); if(d?.speed_bonus) s+=d.speed_bonus; return Math.max(1,s); }
-    function calculateHeatDissipation() { const r=getReactor(); return r?.heat_dissipation || 3; }
+    function calculateSpeed() { let s=getChassis()?.speed||0; const d=getDriveRight(); if(d?.speed_bonus && typeof d.speed_bonus === 'number') s+=d.speed_bonus; return Math.max(1,s); }
+    function calculateHeatDissipation() { const r=getReactor(); return (r && typeof r.heat_dissipation === 'number') ? r.heat_dissipation : 3; }
     
     function rollDamage(str) { const m=str.match(/(\d+)d(\d+)/); if(!m) return 0; let t=0; for(let i=0;i<parseInt(m[1]);i++) t+=Math.floor(Math.random()*parseInt(m[2]))+1; return t; }
     function getBSTarget(bs) { if(bs>=9) return 2; if(bs>=7) return 3; if(bs>=5) return 4; if(bs>=3) return 5; return 6; }
     
-    // Обновление UI в зависимости от состояния (только если шасси выбрано)
+    // Обновление UI в зависимости от состояния
     function updateUIByDestroyedState() {
-        const chassisSelected = mechData.chassisId !== null;
-        // Мех считается уничтоженным только если есть шасси И ХП <= 0
+        const chassisSelected = mechData.chassisId !== null && mechData.chassisId !== "";
         const destroyed = chassisSelected && mechData.isDestroyed;
         
         const btns = ['quickAttackBtn','burstAttackBtn','salvoAttackBtn','applyDamageBtn','rollCritBtn',
@@ -338,9 +338,9 @@
     
     function updateAllStats() {
         const maxHP = calculateMaxHP();
-        const chassisSelected = mechData.chassisId !== null;
+        const chassisSelected = mechData.chassisId !== null && mechData.chassisId !== "";
         
-        // Обновляем отображение ХП
+        // Обновляем отображение
         document.getElementById('hpMax').innerText = maxHP;
         document.getElementById('hpCurrent').innerText = mechData.currentHP;
         document.getElementById('statTB').innerText = calculateTB();
@@ -355,7 +355,7 @@
         let state = heat>=16?"Критический":heat>=11?"Перегрев":heat>=6?"Нагрев":"Норма";
         document.getElementById('heatStateDisplay').innerHTML = state;
         
-        // Логика уничтожения ТОЛЬКО если выбрано шасси
+        // Логика уничтожения ТОЛЬКО если выбрано шасси И ХП <= 0
         if(chassisSelected) {
             if(mechData.currentHP <= 0 && !mechData.isDestroyed) {
                 mechData.isDestroyed = true;
@@ -366,26 +366,29 @@
                 updateUIByDestroyedState();
             }
         } else {
-            // Если шасси не выбрано - меч не может быть уничтожен
-            mechData.isDestroyed = false;
+            // Если шасси не выбрано - мех не может быть уничтожен
+            if(mechData.isDestroyed) mechData.isDestroyed = false;
             updateUIByDestroyedState();
         }
         
-        // Обновление списков оружия (только если есть шасси)
+        // Обновление списков оружия
         const qs = document.getElementById('quickWeaponSelect');
         if(qs && chassisSelected) {
             qs.innerHTML = '<option value="">— оружие —</option>';
             for(let k in mechData.weapons) { const w=WEAPONS_DATA.find(w=>w.id===mechData.weapons[k]); if(w) qs.innerHTML += `<option value="${w.id}">${w.name}</option>`; }
+            qs.disabled = mechData.isDestroyed;
         }
         const bs = document.getElementById('burstWeaponSelect');
         if(bs && chassisSelected) {
             bs.innerHTML = '<option value="">— оружие —</option>';
             for(let k in mechData.weapons) { const w=WEAPONS_DATA.find(w=>w.id===mechData.weapons[k]); if(w && w.type==='Баллистическое') bs.innerHTML += `<option value="${w.id}">${w.name}</option>`; }
+            bs.disabled = mechData.isDestroyed;
         }
         const ss = document.getElementById('salvoWeaponSelect');
         if(ss && chassisSelected) {
             ss.innerHTML = '<option value="">— ракеты —</option>';
             for(let k in mechData.weapons) { const w=WEAPONS_DATA.find(w=>w.id===mechData.weapons[k]); if(w && w.type==='Ракетное') ss.innerHTML += `<option value="${w.id}">${w.name}</option>`; }
+            ss.disabled = mechData.isDestroyed;
         }
         
         // Голограмма
@@ -398,6 +401,7 @@
     }
     
     function saveToStorage() { localStorage.setItem('de_mech', JSON.stringify(mechData)); localStorage.setItem('de_mech_kits', repairKits); localStorage.setItem('de_mech_emergency', emergencyUsed); localStorage.setItem('de_mech_crit', JSON.stringify(critHistory)); }
+    
     function loadFromStorage() {
         const saved = localStorage.getItem('de_mech');
         if(saved) { 
@@ -405,7 +409,7 @@
                 const l=JSON.parse(saved); 
                 mechData={...mechData,...l}; 
                 if(!mechData.damage) mechData.damage={ корпус:0, правая_рука:0, левая_рука:0, правая_нога:0, левая_нога:0, кабина:0 };
-                // Важно: при загрузке не устанавливаем isDestroyed, если шасси не выбрано
+                // Сбрасываем isDestroyed при загрузке, если шасси не выбрано
                 if(!mechData.chassisId) mechData.isDestroyed = false;
             } catch(e){} 
         }
@@ -414,9 +418,14 @@
         const hist = localStorage.getItem('de_mech_crit');
         if(hist) try { critHistory = JSON.parse(hist); document.getElementById('critHistory').innerHTML = critHistory.map(h=>`<div>${h}</div>`).join(''); } catch(e){}
         document.getElementById('repairKits').innerText = repairKits;
+        
+        // Восстанавливаем значения в select'ах
         if(mechData.name) document.getElementById('mechName').value = mechData.name;
         if(mechData.pilot) document.getElementById('pilotName').value = mechData.pilot;
-        if(mechData.chassisId) { document.getElementById('chassisSelect').value = mechData.chassisId; selectChassis(); }
+        if(mechData.chassisId) { 
+            document.getElementById('chassisSelect').value = mechData.chassisId; 
+            selectChassis(); 
+        }
         if(mechData.reactorId) document.getElementById('reactorSelect').value = mechData.reactorId;
         if(mechData.armorId) document.getElementById('armorSelect').value = mechData.armorId;
         if(mechData.driveRightId) document.getElementById('driveRightSelect').value = mechData.driveRightId;
@@ -426,25 +435,24 @@
         if(mechData.cabinId) document.getElementById('cabinSelect').value = mechData.cabinId;
         if(mechData.neuroId) document.getElementById('neuroSelect').value = mechData.neuroId;
         
-        // Если есть шасси, устанавливаем ХП в maxHP, если currentHP = 0
-        const maxHP = calculateMaxHP();
-        if(mechData.chassisId && mechData.currentHP === 0 && maxHP > 0) {
-            mechData.currentHP = maxHP;
-        }
-        updateAllStats(); renderWeapons();
+        updateAllStats(); 
+        renderWeapons();
     }
     
     function renderWeapons() {
         const chassis = getChassis();
-        if(!chassis) { document.getElementById('weaponsContainer').innerHTML = '<div style="color:#888;">Выберите шасси</div>'; return; }
+        if(!chassis) { 
+            document.getElementById('weaponsContainer').innerHTML = '<div style="color:#888;">Выберите шасси</div>'; 
+            return; 
+        }
         const slots = [{type:'small',name:'Малые',c:chassis.slots?.small||0},{type:'medium',name:'Средние',c:chassis.slots?.medium||0},{type:'large',name:'Крупные',c:chassis.slots?.large||0},{type:'siege',name:'Осадные',c:chassis.slots?.siege||0}];
         let html = '';
+        const isDestroyed = mechData.isDestroyed;
         for(let s of slots) {
             for(let i=0;i<s.c;i++) {
                 const key = `${s.type}_${i}`;
                 const wid = mechData.weapons[key];
                 const w = WEAPONS_DATA.find(w=>w.id===wid);
-                const isDestroyed = mechData.isDestroyed && mechData.chassisId !== null;
                 html += `<div class="weapon-slot"><strong>${s.name} слот ${i+1}</strong>
                         <select id="weapon_${key}" onchange="selectWeapon('${key}',this.value)" ${isDestroyed ? 'disabled' : ''}>
                         <option value="">— выбрать —</option>
@@ -456,7 +464,7 @@
     }
     
     window.selectWeapon = function(key,id) { 
-        if(mechData.isDestroyed && mechData.chassisId !== null) return; 
+        if(mechData.isDestroyed) return; 
         mechData.weapons[key]=id||null; 
         updateAllStats(); 
         renderWeapons(); 
@@ -486,7 +494,9 @@
     }
     
     function updateMechFromSelects() {
-        mechData.chassisId = document.getElementById('chassisSelect').value || null;
+        const newChassisId = document.getElementById('chassisSelect').value || null;
+        const wasChassisSelected = mechData.chassisId !== null && mechData.chassisId !== "";
+        mechData.chassisId = newChassisId;
         mechData.reactorId = document.getElementById('reactorSelect').value || null;
         mechData.armorId = document.getElementById('armorSelect').value || null;
         mechData.driveRightId = document.getElementById('driveRightSelect').value || null;
@@ -495,24 +505,32 @@
         mechData.manipLeftId = document.getElementById('manipLeftSelect').value || null;
         mechData.cabinId = document.getElementById('cabinSelect').value || null;
         mechData.neuroId = document.getElementById('neuroSelect').value || null;
+        
         selectChassis();
         
-        // При выборе шасси устанавливаем ХП
+        // При выборе шасси устанавливаем ХП в максимальное, если оно было 0
         const chassis = getChassis();
-        if(chassis && mechData.currentHP === 0) {
-            mechData.currentHP = chassis.hp;
-            mechData.isDestroyed = false;
+        if(chassis) {
+            if(mechData.currentHP === 0 || mechData.currentHP > chassis.hp) {
+                mechData.currentHP = chassis.hp;
+            }
+            // Сбрасываем статус уничтожения при выборе шасси
+            if(mechData.isDestroyed) {
+                mechData.isDestroyed = false;
+            }
         }
     }
     
     function selectChassis() {
         const chassis = CHASSIS_DATA.find(c=>c.id===mechData.chassisId);
         if(chassis) {
+            // Очищаем оружие при смене шасси
+            const oldWeapons = {...mechData.weapons};
             mechData.weapons = {};
-            for(let i=0;i<(chassis.slots?.small||0);i++) mechData.weapons[`small_${i}`]=null;
-            for(let i=0;i<(chassis.slots?.medium||0);i++) mechData.weapons[`medium_${i}`]=null;
-            for(let i=0;i<(chassis.slots?.large||0);i++) mechData.weapons[`large_${i}`]=null;
-            for(let i=0;i<(chassis.slots?.siege||0);i++) mechData.weapons[`siege_${i}`]=null;
+            for(let i=0;i<(chassis.slots?.small||0);i++) mechData.weapons[`small_${i}`]=oldWeapons[`small_${i}`] || null;
+            for(let i=0;i<(chassis.slots?.medium||0);i++) mechData.weapons[`medium_${i}`]=oldWeapons[`medium_${i}`] || null;
+            for(let i=0;i<(chassis.slots?.large||0);i++) mechData.weapons[`large_${i}`]=oldWeapons[`large_${i}`] || null;
+            for(let i=0;i<(chassis.slots?.siege||0);i++) mechData.weapons[`siege_${i}`]=oldWeapons[`siege_${i}`] || null;
             renderWeapons();
         }
     }
@@ -531,7 +549,11 @@
         if(confirm(`Загрузить "${prebuilt.name}"?`)) {
             document.getElementById('mechName').value = prebuilt.name;
             mechData.name = prebuilt.name;
-            if(prebuilt.chassis) { mechData.chassisId = prebuilt.chassis; document.getElementById('chassisSelect').value = prebuilt.chassis; selectChassis(); }
+            if(prebuilt.chassis) { 
+                mechData.chassisId = prebuilt.chassis; 
+                document.getElementById('chassisSelect').value = prebuilt.chassis; 
+                selectChassis(); 
+            }
             mechData.reactorId = prebuilt.reactor || null; if(prebuilt.reactor) document.getElementById('reactorSelect').value = prebuilt.reactor;
             mechData.armorId = prebuilt.armor || null; if(prebuilt.armor) document.getElementById('armorSelect').value = prebuilt.armor;
             mechData.driveRightId = prebuilt.right_drive || null; if(prebuilt.right_drive) document.getElementById('driveRightSelect').value = prebuilt.right_drive;
@@ -542,49 +564,57 @@
             mechData.neuroId = prebuilt.neurohelmet || null; if(prebuilt.neurohelmet) document.getElementById('neuroSelect').value = prebuilt.neurohelmet;
             if(prebuilt.weapons) {
                 let idx=0;
-                for(let key in mechData.weapons) if(idx<prebuilt.weapons.length) mechData.weapons[key]=prebuilt.weapons[idx++];
+                for(let key in mechData.weapons) {
+                    if(idx<prebuilt.weapons.length) mechData.weapons[key]=prebuilt.weapons[idx++];
+                    else mechData.weapons[key]=null;
+                }
             }
-            mechData.currentHP = calculateMaxHP();
+            const chassis = getChassis();
+            mechData.currentHP = chassis ? chassis.hp : 0;
             mechData.currentHeat = 0;
             mechData.isDestroyed = false;
             mechData.damage = { корпус:0, правая_рука:0, левая_рука:0, правая_нога:0, левая_нога:0, кабина:0 };
-            updateAllStats(); renderWeapons(); saveToStorage();
+            updateAllStats(); 
+            renderWeapons(); 
+            saveToStorage();
             alert(`✅ Загружена сборка: ${prebuilt.name}`);
         }
         document.getElementById('prebuiltSelect').value = "";
     };
     
     window.modifyHP = function(d) {
-        const chassisSelected = mechData.chassisId !== null;
+        const chassisSelected = mechData.chassisId !== null && mechData.chassisId !== "";
         if(!chassisSelected) { alert("Сначала выберите шасси!"); return; }
-        if(mechData.isDestroyed && d>0) {
-            // Ремонт через modifyHP тоже работает
-            const maxHP = calculateMaxHP();
-            mechData.currentHP = Math.min(maxHP, mechData.currentHP + d);
-            if(mechData.currentHP > 0 && mechData.isDestroyed) {
-                mechData.isDestroyed = false;
-                updateUIByDestroyedState();
-                alert("🔧 Мех восстановлен!");
-            }
-        } else if(!mechData.isDestroyed) {
-            const maxHP = calculateMaxHP();
-            let newHP = mechData.currentHP + d;
-            if(newHP > maxHP) newHP = maxHP;
-            if(newHP < 0) newHP = 0;
-            mechData.currentHP = newHP;
-        } else if(mechData.isDestroyed && d<=0) {
-            alert("Мех уничтожен! Используйте ремонт для восстановления.");
-            return;
+        const maxHP = calculateMaxHP();
+        let newHP = mechData.currentHP + d;
+        if(newHP > maxHP) newHP = maxHP;
+        if(newHP < 0) newHP = 0;
+        mechData.currentHP = newHP;
+        
+        if(mechData.currentHP <= 0 && !mechData.isDestroyed) {
+            mechData.isDestroyed = true;
+            updateUIByDestroyedState();
+            alert("💀 МЕХ УНИЧТОЖЕН! Используйте ремонт.");
+        } else if(mechData.currentHP > 0 && mechData.isDestroyed) {
+            mechData.isDestroyed = false;
+            updateUIByDestroyedState();
+            alert("🔧 Мех восстановлен!");
         }
-        updateAllStats(); saveToStorage();
+        updateAllStats(); 
+        saveToStorage();
     };
     
-    window.modifyHeat = function(v) { if(mechData.isDestroyed && mechData.chassisId !== null) return; mechData.currentHeat = Math.min(20, Math.max(0, (mechData.currentHeat||0)+v)); updateAllStats(); saveToStorage(); };
+    window.modifyHeat = function(v) { 
+        if(mechData.isDestroyed) return; 
+        mechData.currentHeat = Math.min(20, Math.max(0, (mechData.currentHeat||0)+v)); 
+        updateAllStats(); 
+        saveToStorage(); 
+    };
     window.addHeat = window.modifyHeat;
-    window.resetHeat = function() { if(mechData.isDestroyed && mechData.chassisId !== null) return; mechData.currentHeat = 0; updateAllStats(); saveToStorage(); };
-    window.updateHeatFromSlider = function() { if(mechData.isDestroyed && mechData.chassisId !== null) return; mechData.currentHeat = parseInt(document.getElementById('heatSlider').value); updateAllStats(); saveToStorage(); };
+    window.resetHeat = function() { if(mechData.isDestroyed) return; mechData.currentHeat = 0; updateAllStats(); saveToStorage(); };
+    window.updateHeatFromSlider = function() { if(mechData.isDestroyed) return; mechData.currentHeat = parseInt(document.getElementById('heatSlider').value); updateAllStats(); saveToStorage(); };
     window.emergencyCooling = function() { 
-        if(mechData.isDestroyed && mechData.chassisId !== null) { alert("Мех уничтожен!"); return; } 
+        if(mechData.isDestroyed) { alert("Мех уничтожен!"); return; } 
         if(emergencyUsed) { alert("Уже использовано!"); return; } 
         const r=Math.floor(Math.random()*12)+2; 
         mechData.currentHeat=Math.max(0,(mechData.currentHeat||0)-r); 
@@ -595,7 +625,7 @@
     };
     
     window.quickAttack = function() {
-        if(mechData.isDestroyed && mechData.chassisId !== null) { alert("Мех уничтожен! Невозможно атаковать."); return; }
+        if(mechData.isDestroyed) { alert("Мех уничтожен! Невозможно атаковать."); return; }
         const wid = document.getElementById('quickWeaponSelect').value;
         if(!wid) { alert('Выберите оружие!'); return; }
         const w = WEAPONS_DATA.find(w=>w.id===wid);
@@ -621,7 +651,7 @@
     };
     
     window.burstAttack = function() {
-        if(mechData.isDestroyed && mechData.chassisId !== null) { alert("Мех уничтожен! Невозможно атаковать."); return; }
+        if(mechData.isDestroyed) { alert("Мех уничтожен! Невозможно атаковать."); return; }
         const wid = document.getElementById('burstWeaponSelect').value;
         if(!wid) { alert('Выберите оружие!'); return; }
         const w = WEAPONS_DATA.find(w=>w.id===wid);
@@ -659,7 +689,7 @@
     }
     
     window.salvoAttack = function() {
-        if(mechData.isDestroyed && mechData.chassisId !== null) { alert("Мех уничтожен! Невозможно атаковать."); return; }
+        if(mechData.isDestroyed) { alert("Мех уничтожен! Невозможно атаковать."); return; }
         const wid = document.getElementById('salvoWeaponSelect').value;
         if(!wid) { alert('Выберите ракетную установку!'); return; }
         const w = WEAPONS_DATA.find(w=>w.id===wid);
@@ -691,7 +721,7 @@
     };
     
     window.applyDamageToMech = function() {
-        const chassisSelected = mechData.chassisId !== null;
+        const chassisSelected = mechData.chassisId !== null && mechData.chassisId !== "";
         if(!chassisSelected) { alert("Сначала выберите шасси!"); return; }
         if(mechData.isDestroyed) { alert("Мех уже уничтожен! Сначала восстановите."); return; }
         let dmg = parseInt(document.getElementById('incomingDamage').value) || 0;
@@ -718,11 +748,12 @@
             updateUIByDestroyedState();
         }
         document.getElementById('damageTakenResult').innerHTML = result;
-        updateAllStats(); saveToStorage();
+        updateAllStats(); 
+        saveToStorage();
     };
     
     window.rollCritical = function() {
-        if(mechData.isDestroyed && mechData.chassisId !== null) { alert("Мех уничтожен!"); return; }
+        if(mechData.isDestroyed) { alert("Мех уничтожен!"); return; }
         const r = Math.floor(Math.random()*6)+1;
         const c = CRIT_TABLE[r-1];
         const res = `🎲 КРИТ ${r}: ${c.component} — ${c.effect}`;
@@ -736,7 +767,7 @@
     window.modifyRepairKits = function(d) { repairKits = Math.max(0, repairKits+d); document.getElementById('repairKits').innerText = repairKits; saveToStorage(); };
     
     function repairMech(healAmount, msg) {
-        const chassisSelected = mechData.chassisId !== null;
+        const chassisSelected = mechData.chassisId !== null && mechData.chassisId !== "";
         if(!chassisSelected) { alert("Сначала выберите шасси!"); return false; }
         if(repairKits<=0){ alert("Нет ремонтных наборов!"); return false; }
         repairKits--;
@@ -750,7 +781,8 @@
             alert("🔧 МЕХ ВОССТАНОВЛЕН!");
         }
         document.getElementById('repairResult').innerHTML = msg + ` +${healAmount} ХП. Текущее ХП: ${mechData.currentHP}/${maxHP}`;
-        updateAllStats(); saveToStorage();
+        updateAllStats(); 
+        saveToStorage();
         return true;
     }
     
